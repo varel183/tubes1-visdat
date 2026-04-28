@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indonesia Pakai AI — Tapi Belum Siap</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="poster-container">
+        <!-- SECTION 1: HOOK -->
+        <section class="hook-section">
+            <h1 class="hook-title">Indonesia pakai AI lebih banyak dari Jerman — <br><span class="highlight-red">tapi rank AI-nya 47 tingkat di bawahnya.</span></h1>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-value text-accent">9/100</div>
+                    <div class="stat-label">AI Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value text-accent">#39</div>
+                    <div class="stat-label">Global Rank</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value text-accent">9 Juta</div>
+                    <div class="stat-label">Tech workers needed 2030</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: SANKEY + BAR + BUBBLE -->
+        <section class="flow-section">
+            <div class="chart-header">
+                <div class="col-sankey">GDP PER CAPITA (width of band)</div>
+                <div class="col-bar">GOV. STRATEGY SCORE</div>
+                <div class="col-bubble">AI SCORE</div>
+            </div>
+            <div class="chart-body" id="flow-charts">
+                <!-- D3 appends SVG here -->
+                <div id="tooltip" class="d3-tooltip"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: STACKED BAR (PILLARS) -->
+        <section class="pillars-section">
+            <h2 class="section-title">AI PILLAR DISTRIBUTION</h2>
+            <div class="legend-container" id="pillar-legend"></div>
+            <div id="pillars-chart">
+                <!-- D3 appends SVG here -->
+            </div>
+        </section>
+
+        <!-- SECTION 4: RADAR CHARTS -->
+        <section class="radar-section">
+            <h2 class="section-title">KESIAPAN MAHASISWA MENGHADAPI AI — PERBANDINGAN INTERNASIONAL</h2>
+            <div class="radar-container">
+                <div class="radar-wrapper">
+                    <canvas id="radar1"></canvas>
+                </div>
+                <div class="radar-wrapper">
+                    <canvas id="radar2"></canvas>
+                </div>
+                <div class="radar-wrapper">
+                    <canvas id="radar3"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: CTA -->
+        <section class="cta-section">
+            <h2 class="cta-quote">"Masalahnya bukan uang. Bukan talenta. Bukan internet."</h2>
+            <p class="cta-sub">Gov. Strategy: 19 -> 39 = proyeksi naik dari rank #39 ke #16 dunia &nbsp;|&nbsp; India (GDP < Indonesia) · Gov Strategy 55 = rank #12</p>
+            <p class="footer-sources">Tortoise Global AI Index 2024 · UNDP Human Development Report 2023 · World Bank Internet Penetration 2023 · FITPED Cross-National AI Education Survey 2024 (n=1,205)</p>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
