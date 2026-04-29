@@ -88,11 +88,7 @@ body {
     position: relative;
 }
 .sankey-link {
-    transition: opacity 0.2s;
-    cursor: pointer;
-}
-.sankey-link:hover {
-    opacity: 0.9 !important;
+    cursor: default
 }
 
 /* --- SECTION 3: PILLARS --- */
