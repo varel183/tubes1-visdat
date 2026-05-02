@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indonesia Pakai AI — Tapi Belum Siap</title>
+    <title>Indonesia Pakai AI, Tapi Belum Siap</title>
     <link rel="stylesheet" href="style.css">
     <!-- D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -14,27 +14,140 @@
 </head>
 <body>
     <div class="poster-container">
+        <svg class="ai-bg-visual" viewBox="0 0 1400 3200" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <g class="ai-bg-lines">
+                <path d="M1030 150 C1150 190, 1210 255, 1295 340" />
+                <path d="M1065 235 L1210 235 L1290 310" />
+                <path d="M990 520 C1120 480, 1210 510, 1330 605" />
+                <path d="M142 1210 C260 1120, 390 1135, 515 1258" />
+                <path d="M160 1395 L340 1395 L475 1518" />
+                <path d="M1040 2135 C1148 2055, 1260 2080, 1340 2195" />
+                <path d="M1010 2345 L1138 2270 L1325 2288" />
+                <path d="M250 2485 C375 2415, 520 2445, 635 2575" />
+            </g>
+            <g class="ai-bg-nodes">
+                <circle cx="1030" cy="150" r="5" />
+                <circle cx="1210" cy="235" r="7" />
+                <circle cx="1295" cy="340" r="5" />
+                <circle cx="990" cy="520" r="5" />
+                <circle cx="1330" cy="605" r="7" />
+                <circle cx="142" cy="1210" r="6" />
+                <circle cx="340" cy="1395" r="7" />
+                <circle cx="515" cy="1258" r="5" />
+                <circle cx="475" cy="1518" r="6" />
+                <circle cx="1040" cy="2135" r="5" />
+                <circle cx="1260" cy="2080" r="7" />
+                <circle cx="1340" cy="2195" r="5" />
+                <circle cx="1010" cy="2345" r="6" />
+                <circle cx="1138" cy="2270" r="5" />
+                <circle cx="1325" cy="2288" r="7" />
+                <circle cx="250" cy="2485" r="6" />
+                <circle cx="520" cy="2445" r="7" />
+                <circle cx="635" cy="2575" r="5" />
+            </g>
+            <g class="ai-bg-chip" transform="translate(1068 285)">
+                <rect x="0" y="0" width="132" height="104" rx="16" />
+                <rect x="28" y="24" width="76" height="56" rx="10" />
+                <path d="M-30 22 H0 M-30 52 H0 M-30 82 H0 M132 22 H162 M132 52 H162 M132 82 H162 M36 -28 V0 M66 -28 V0 M96 -28 V0 M36 104 V132 M66 104 V132 M96 104 V132" />
+                <text x="66" y="61">AI</text>
+            </g>
+            <g class="ai-bg-chip" transform="translate(115 1560) scale(0.82)">
+                <rect x="0" y="0" width="132" height="104" rx="16" />
+                <rect x="28" y="24" width="76" height="56" rx="10" />
+                <path d="M-30 22 H0 M-30 52 H0 M-30 82 H0 M132 22 H162 M132 52 H162 M132 82 H162 M36 -28 V0 M66 -28 V0 M96 -28 V0 M36 104 V132 M66 104 V132 M96 104 V132" />
+                <text x="66" y="61">AI</text>
+            </g>
+            <g class="ai-bg-chip" transform="translate(1112 2440) scale(0.9)">
+                <rect x="0" y="0" width="132" height="104" rx="16" />
+                <rect x="28" y="24" width="76" height="56" rx="10" />
+                <path d="M-30 22 H0 M-30 52 H0 M-30 82 H0 M132 22 H162 M132 52 H162 M132 82 H162 M36 -28 V0 M66 -28 V0 M96 -28 V0 M36 104 V132 M66 104 V132 M96 104 V132" />
+                <text x="66" y="61">AI</text>
+            </g>
+            <g class="ai-bg-chip" transform="translate(80 500) scale(0.7)">
+                <rect x="0" y="0" width="132" height="104" rx="16" />
+                <rect x="28" y="24" width="76" height="56" rx="10" />
+                <path d="M-30 22 H0 M-30 52 H0 M-30 82 H0 M132 22 H162 M132 52 H162 M132 82 H162 M36 -28 V0 M66 -28 V0 M96 -28 V0 M36 104 V132 M66 104 V132 M96 104 V132" />
+                <text x="66" y="61">DATA</text>
+            </g>
+            <g class="ai-bg-chip" transform="translate(1200 1300) scale(0.6)">
+                <rect x="0" y="0" width="132" height="104" rx="16" />
+                <rect x="28" y="24" width="76" height="56" rx="10" />
+                <path d="M-30 22 H0 M-30 52 H0 M-30 82 H0 M132 22 H162 M132 52 H162 M132 82 H162 M36 -28 V0 M66 -28 V0 M96 -28 V0 M36 104 V132 M66 104 V132 M96 104 V132" />
+                <text x="66" y="61">TECH</text>
+            </g>
+        </svg>
         <!-- SECTION 1: HOOK -->
         <section class="hook-section">
-            <h1 class="hook-title">Indonesia pakai AI lebih banyak dari Jerman — <br><span class="highlight-red">tapi rank AI-nya 47 tingkat di bawahnya.</span></h1>
+            <h1 class="hook-title">Indonesia pakai AI lebih banyak dari Jerman,<br><span class="highlight-red">tapi peringkat AI-nya 47 tingkat di bawahnya.</span></h1>
             <div class="stats-container">
                 <div class="stat-card">
                     <div class="stat-value text-accent">9/100</div>
-                    <div class="stat-label">AI Score</div>
+                    <div class="stat-label">AI Score (Rank #39)</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value text-accent">#39</div>
-                    <div class="stat-label">Global Rank</div>
+                    <div class="stat-value text-accent">19/100</div>
+                    <div class="stat-label">Gov. Strategy Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value text-accent">73%</div>
+                    <div class="stat-label">Internet Penetration</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value text-accent">9 Juta</div>
-                    <div class="stat-label">Tech workers needed 2030</div>
+                    <div class="stat-label">Talenta Digital Diharapkan (2030)</div>
+                </div>
+            </div>
+            <div class="narrative-strip">
+                <div class="story-beat">
+                    <span class="beat-number">01</span>
+                    <p>Adopsi AI sudah muncul di keseharian, tapi fondasi nasionalnya belum setebal negara pembanding.</p>
+                </div>
+                <div class="story-beat">
+                    <span class="beat-number">02</span>
+                    <p>Masalah utama terlihat pada arah strategi: skor pemerintah Indonesia masih pendek di tengah kebutuhan talenta yang besar.</p>
+                </div>
+                <div class="story-beat">
+                    <span class="beat-number">03</span>
+                    <p>Intinya: penggunaan AI tinggi, tetapi strategi, riset, dan infrastruktur belum mengejar.</p>
                 </div>
             </div>
         </section>
 
         <!-- SECTION 2: SANKEY + BAR + BUBBLE -->
         <section class="flow-section">
+            <div class="radar-insight" style="margin: 0 auto 20px; max-width: 900px;">
+                <p>Indonesia memiliki ekonomi yang sangat besar (GDP total), namun strategi permerintah dalam regulasi AI masih belum sekuat negara berkembang lainnya seperti India atau Brazil, menyebabkan hambatan pada skor AI secara keseluruhan.</p>
+            </div>
+            <div class="continent-key" aria-label="Legenda warna benua">
+                <div class="continent-key-item" style="--continent-color:#31f8b9">
+                    <svg class="continent-icon" viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M22 5c-6 3-9 8-8 14 1 4 5 5 6 9 2 6-1 10 4 14 4-3 4-8 7-12 3-5 8-7 7-13-1-7-8-12-16-12z" />
+                        <path d="M14 19c-4 1-6 4-6 8 0 5 4 8 9 9" />
+                    </svg>
+                    Americas
+                </div>
+                <div class="continent-key-item" style="--continent-color:#50f3ff">
+                    <svg class="continent-icon" viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M17 13c5-5 15-4 19 2 3 5 0 9-5 10-4 1-5 6-10 7-6 0-11-4-10-10 0-4 3-6 6-9z" />
+                        <path d="M29 25c4 2 6 5 7 9" />
+                    </svg>
+                    Europe
+                </div>
+                <div class="continent-key-item" style="--continent-color:#ad7efd">
+                    <svg class="continent-icon" viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M8 18c5-8 19-11 29-6 5 3 6 8 2 12-3 4-10 3-12 8-2 4-7 6-12 4-4-2-3-7-6-10-3-3-3-5-1-8z" />
+                        <path d="M31 31c3 2 5 5 5 9" />
+                    </svg>
+                    Asia
+                </div>
+                <div class="continent-key-item" style="--continent-color:#FB923C">
+                    <svg class="continent-icon" viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M22 6c8 4 13 12 11 20-1 5-6 8-7 14-7-3-13-10-14-18-1-7 3-13 10-16z" />
+                        <path d="M29 16c4 2 7 5 9 9" />
+                    </svg>
+                    Africa
+                </div>
+            </div>
             <div class="chart-header">
                 <div class="col-sankey">GDP PER CAPITA (width of band)</div>
                 <div class="col-bar">GOV. STRATEGY SCORE</div>
@@ -49,6 +162,10 @@
         <!-- SECTION 3: STACKED BAR (PILLARS) -->
         <section class="pillars-section">
             <h2 class="section-title">AI PILLAR DISTRIBUTION</h2>
+            <p class="section-narrative narrow">Skor AI dibentuk oleh beberapa pilar. Di Indonesia, pilar strategi masih menjadi titik lemah utama.</p>
+            <div class="radar-insight" style="margin: 0 auto 20px; max-width: 900px; padding: 15px 25px;">
+                <p>Dibandingkan negara tetangga seperti Singapura atau bahkan Vietnam, fondasi utama seperti Riset, Pengembangan, dan Infrastruktur Indonesia masih sangat tertinggal, menghambat pemanfaatan AI secara produktif.</p>
+            </div>
             <div class="legend-container" id="pillar-legend"></div>
             <div id="pillars-chart">
                 <!-- D3 appends SVG here -->
@@ -57,24 +174,53 @@
 
         <!-- SECTION 4: RADAR CHARTS -->
         <section class="radar-section">
-            <h2 class="section-title">KESIAPAN MAHASISWA MENGHADAPI AI — PERBANDINGAN INTERNASIONAL</h2>
+            <h2 class="section-title">KESIAPAN MAHASISWA MENGHADAPI AI: PERBANDINGAN INTERNASIONAL</h2>
             <div class="radar-container">
-                <div class="radar-wrapper">
+                <div class="radar-wrapper radar-idn">
+                    <div class="radar-metaphor" aria-hidden="true">
+                        <svg viewBox="0 0 40 40">
+                            <path d="M12 21a8 8 0 1 1 16 0v7a5 5 0 0 1-5 5h-6a5 5 0 0 1-5-5z" />
+                            <path d="M12 23H8m24 0h-4M15 13l-3-4m13 4 3-4M16 29h8" />
+                            <circle cx="17" cy="20" r="1.7" />
+                            <circle cx="23" cy="20" r="1.7" />
+                        </svg>
+                    </div>
                     <canvas id="radar1"></canvas>
                 </div>
-                <div class="radar-wrapper">
+                <div class="radar-wrapper radar-eur">
+                    <div class="radar-metaphor" aria-hidden="true">
+                        <svg viewBox="0 0 40 40">
+                            <circle cx="20" cy="20" r="4" />
+                            <circle cx="10" cy="12" r="3" />
+                            <circle cx="30" cy="12" r="3" />
+                            <circle cx="11" cy="30" r="3" />
+                            <circle cx="30" cy="29" r="3" />
+                            <path d="M13 14l4 4m10-4-4 4m-7 5-4 5m12-5 4 4" />
+                        </svg>
+                    </div>
                     <canvas id="radar2"></canvas>
                 </div>
-                <div class="radar-wrapper">
+                <div class="radar-wrapper radar-ideal">
+                    <div class="radar-metaphor" aria-hidden="true">
+                        <svg viewBox="0 0 40 40">
+                            <circle cx="20" cy="20" r="14" />
+                            <circle cx="20" cy="20" r="8" />
+                            <circle cx="20" cy="20" r="2.7" />
+                            <path d="M20 4v6M20 30v6M4 20h6M30 20h6" />
+                        </svg>
+                    </div>
                     <canvas id="radar3"></canvas>
                 </div>
+            </div>
+            <div class="radar-insight">
+                <p>Mahasiswa relatif siap memakai AI. Tantangannya ada pada ekosistem nasional yang belum sama kuat.</p>
             </div>
         </section>
 
         <!-- SECTION 5: CTA -->
         <section class="cta-section">
             <h2 class="cta-quote">"Masalahnya bukan uang. Bukan talenta. Bukan internet."</h2>
-            <p class="cta-sub">Gov. Strategy: 19 -> 39 = proyeksi naik dari rank #39 ke #16 dunia &nbsp;|&nbsp; India (GDP < Indonesia) · Gov Strategy 55 = rank #12</p>
+            <p class="cta-sub">Gov. Strategy 19 ke 39: proyeksi naik dari rank #39 ke #16 dunia &nbsp;|&nbsp; India (GDP < Indonesia): Gov Strategy 55, rank #12</p>
             <p class="footer-sources">Tortoise Global AI Index 2024 · UNDP Human Development Report 2023 · World Bank Internet Penetration 2023 · FITPED Cross-National AI Education Survey 2024 (n=1,205)</p>
         </section>
     </div>

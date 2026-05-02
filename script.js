@@ -3,46 +3,46 @@ const COLORS = {
     bg: '#0D1B2E',
     panelBg: '#1E293B',
     textMain: '#F1F5F9',
-    textDim: '#94A3B8',
+    textDim: '#d0d8e3',
     accent: '#FBBF24',
     red: '#E24B4A',
-    muted: '#334155',
+    muted: '#828c9b',
     blue: '#378ADD'
 };
 
-const COUNTRY_COLORS = {
-    'Indonesia'     : '#E24B4A',
-    'Singapore'     : '#5B9BD5',
-    'Brazil'        : '#1D9E75',
-    'India'         : '#E8A838',
-    'United States' : '#60A5FA',
-    'China'         : '#F87171',
-    'Germany'       : '#A78BFA',
-    'United Kingdom': '#34D399',
-    'France'        : '#FB923C',
-    'Finland'       : '#38BDF8',
-    'Japan'         : '#F9A8D4',
-    'South Korea'   : '#86EFAC',
-    'Canada'        : '#67E8F9',
-    'Australia'     : '#FCD34D',
-};
+// const COUNTRY_COLORS = {
+//     'Indonesia'     : '#E24B4A',
+//     'Singapore'     : '#5B9BD5',
+//     'Brazil'        : '#1D9E75',
+//     'India'         : '#E8A838',
+//     'United States' : '#60A5FA',
+//     'China'         : '#F87171',
+//     'Germany'       : '#A78BFA',
+//     'United Kingdom': '#34D399',
+//     'France'        : '#FB923C',
+//     'Finland'       : '#38BDF8',
+//     'Japan'         : '#F9A8D4',
+//     'South Korea'   : '#86EFAC',
+//     'Canada'        : '#67E8F9',
+//     'Australia'     : '#FCD34D',
+// };
 
 const REGION_COLORS = {
-    'Asia'     : '#7C3AED',
-    'Europe'   : '#0891B2',
-    'Americas' : '#059669',
-    'Africa'   : '#D97706',
+    'Asia'     : '#ad7efd',
+    'Europe'   : '#50f3ff',
+    'Americas' : '#31f8b9',
+    'Africa'   : '#FB923C',
     'Oceania'  : '#BE185D',
     'Others'   : '#475569',
 };
 
 const PILLARS = [
-    {key: 'ai_talent', label: 'Talent', color: '#818CF8'},
-    {key: 'ai_infrastructure', label: 'Infrastructure', color: '#38BDF8'},
-    {key: 'ai_government_strategy', label: 'Gov. Strategy', color: '#34D399'},
-    {key: 'ai_research', label: 'Research', color: '#FBBF24'},
-    {key: 'ai_development', label: 'Development', color: '#F472B6'},
-    {key: 'ai_commercial', label: 'Commercial', color: '#FB923C'},
+    {key: 'ai_talent', label: 'Talent', color: '#7C5CFF', icon: 'talent'},
+    {key: 'ai_infrastructure', label: 'Infrastructure', color: '#7DD3FC', icon: 'infra'},
+    {key: 'ai_government_strategy', label: 'Gov. Strategy', color: '#FBBF24', icon: 'strategy'},
+    {key: 'ai_research', label: 'Research', color: '#22D3EE', icon: 'research'},
+    {key: 'ai_development', label: 'Development', color: '#34D399', icon: 'development'},
+    {key: 'ai_commercial', label: 'Commercial', color: '#CBD5E1', icon: 'commercial'},
 ];
 
 const REGION_MAP = {
@@ -59,10 +59,98 @@ const REGION_MAP = {
     'Australia':'Oceania','New Zealand':'Oceania',
 };
 
-function getCountryColor(country, region) {
-    if (COUNTRY_COLORS[country]) return COUNTRY_COLORS[country];
-    if (REGION_COLORS[region]) return REGION_COLORS[region];
-    return COLORS.muted;
+function getCountryColor(country, region, index = 0) {
+    if (country === 'Indonesia') return COLORS.red; // highlight utama
+    
+    let baseColor = REGION_COLORS[region];
+    let color = d3.hsl(baseColor);
+    
+    return color.toString();
+}
+
+function getPillarIcon(type) {
+    const icons = {
+        talent: '<svg viewBox="0 0 24 24"><path d="M8 19v-2a4 4 0 0 1 8 0v2"/><circle cx="12" cy="8" r="4"/><path d="M4 21h16"/></svg>',
+        infra: '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="6" rx="2"/><rect x="5" y="14" width="14" height="6" rx="2"/><path d="M8 7h.01M8 17h.01M12 10v4"/></svg>',
+        strategy: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l4 2"/><path d="M4 20l3-3M20 4l-3 3"/></svg>',
+        research: '<svg viewBox="0 0 24 24"><path d="M10 4v6l-5 8a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-8V4"/><path d="M8 4h8M8 15h8"/></svg>',
+        development: '<svg viewBox="0 0 24 24"><path d="M8 17l-5-5 5-5M16 7l5 5-5 5"/><path d="M14 4l-4 16"/></svg>',
+        commercial: '<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z"/><path d="M9 8a3 3 0 0 1 6 0"/><path d="M8 13h8"/></svg>',
+    };
+
+    return icons[type] || icons.strategy;
+}
+
+function drawInsightOval(g, x, y, lines, options = {}) {
+    const rx = options.rx || 115;
+    const ry = options.ry || 38;
+    const textColor = options.textColor || '#6F7F94';
+    const strokeColor = options.strokeColor || '#2B3A4E';
+    const fontSize = options.fontSize || 12;
+
+    const group = g.append("g").attr("class", "insight-oval");
+    group.append("ellipse")
+        .attr("cx", x)
+        .attr("cy", y)
+        .attr("rx", rx)
+        .attr("ry", ry)
+        .attr("fill", "transparent")
+        .attr("stroke", strokeColor)
+        .attr("stroke-width", 1.4)
+        .attr("stroke-dasharray", "5 6")
+        .attr("stroke-opacity", 0.78);
+
+    lines.forEach((line, i) => {
+        const offset = (i - (lines.length - 1) / 2) * fontSize * 1.25;
+        group.append("text")
+            .attr("x", x)
+            .attr("y", y + offset)
+            .attr("fill", textColor)
+            .attr("font-size", `${fontSize}px`)
+            .attr("font-weight", 700)
+            .attr("text-anchor", "middle")
+            .attr("alignment-baseline", "middle")
+            .style("letter-spacing", "0px")
+            .text(line);
+    });
+}
+
+function resolveBubblePositions(nodes, topLimit, bottomLimit, padding = 5) {
+    nodes.sort((a, b) => a.y0 - b.y0);
+
+    nodes.forEach(node => {
+        node.y = Math.max(topLimit + node.r, Math.min(bottomLimit - node.r, node.y0));
+    });
+
+    for (let pass = 0; pass < 3; pass++) {
+        for (let i = 1; i < nodes.length; i++) {
+            const prev = nodes[i - 1];
+            const node = nodes[i];
+            const minY = prev.y + prev.r + node.r + padding;
+            if (node.y < minY) node.y = minY;
+        }
+
+        const overflow = nodes[nodes.length - 1].y + nodes[nodes.length - 1].r - bottomLimit;
+        if (overflow > 0) {
+            nodes.forEach(node => { node.y -= overflow; });
+        }
+
+        for (let i = nodes.length - 2; i >= 0; i--) {
+            const next = nodes[i + 1];
+            const node = nodes[i];
+            const maxY = next.y - next.r - node.r - padding;
+            if (node.y > maxY) node.y = maxY;
+        }
+
+        const underflow = topLimit - (nodes[0].y - nodes[0].r);
+        if (underflow > 0) {
+            nodes.forEach(node => { node.y += underflow; });
+        }
+    }
+}
+
+function keepBubbleInsideColumn(y, r, topLimit, bottomLimit) {
+    return Math.max(topLimit + r, Math.min(bottomLimit - r, y));
 }
 
 Promise.all([
@@ -104,7 +192,7 @@ Promise.all([
 });
 
 function renderSection2(data) {
-    // Top 12 + ASEAN + Peers
+    // 1. Data Filtering & Sorting
     let sortedGlobal = [...data].sort((a,b) => b.ai_overall_score - a.ai_overall_score);
     let top12 = sortedGlobal.slice(0, 12).map(d => d.country);
     let asean = ['Malaysia','Thailand','Indonesia','Vietnam','Philippines'];
@@ -113,51 +201,35 @@ function renderSection2(data) {
     let selectedNames = new Set([...top12, ...asean, ...peers]);
     let df = data.filter(d => selectedNames.has(d.country));
 
-    const REGION_ORDER = ['Americas','Asia','Europe','Africa','Oceania','Others'];
-    df.sort((a, b) => {
-        let riA = REGION_ORDER.indexOf(a.region);
-        let riB = REGION_ORDER.indexOf(b.region);
-        if (riA === -1) riA = 99;
-        if (riB === -1) riB = 99;
-        if (riA !== riB) return riA - riB;
-        return b.gdp_per_capita - a.gdp_per_capita;
-    });
+    df.sort((a, b) => b.gdp_per_capita - a.gdp_per_capita);
 
     const N = df.length;
     const TOTAL_GDP = d3.sum(df, d => d.gdp_per_capita);
 
-    // Setup SVG
+    // 2. Setup SVG & Geometries
     const container = document.getElementById("flow-charts");
     const width = container.clientWidth;
     const height = container.clientHeight;
+    const svg = d3.select("#flow-charts").append("svg").attr("width", width).attr("height", height);
 
-    const svg = d3.select("#flow-charts")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height);
-
-    // Columns width ratios: Sankey(5.5), Bar(3.5), Bubble(1.5)
     const sankeyW = width * 0.52;
     const barW = width * 0.33;
     const bubW = width * 0.15;
-    
-    // Y Geometries
     const REGION_GAP = 50;
     
-    // Left side y-centers (grouped by region, proportional to GDP)
-    let regionsInOrder = [...new Set(df.map(d => d.region))];
+    const REGION_ORDER = ['Americas', 'Europe','Asia',  'Oceania', 'Others', 'Africa',];
+    let uniqueRegions = [...new Set(df.map(d => d.region))];
+    let regionsInOrder = uniqueRegions.sort((a, b) => 
+        REGION_ORDER.indexOf(a) - REGION_ORDER.indexOf(b)
+    );
     let gapBudget = regionsInOrder.length * REGION_GAP;
-    let bandBudget = height - gapBudget - 40; // Total height allocated for GDP thickness
+    let bandBudget = height - gapBudget - 40;
 
     df.forEach(d => {
-        d.h = (d.gdp_per_capita / TOTAL_GDP) * bandBudget;
-        // ensure minimum thickness so it's visible and text can fit
-        if (d.h < 9) d.h = 9;
+        d.h = Math.max(9, (d.gdp_per_capita / TOTAL_GDP) * bandBudget);
     });
 
-    // Re-evaluate bandBudget because of minimums
     let actualBandTotal = d3.sum(df, d => d.h);
-    
     let curY = height - 20;
     regionsInOrder.slice().reverse().forEach(reg => {
         let regRows = df.filter(d => d.region === reg).reverse();
@@ -170,7 +242,6 @@ function renderSection2(data) {
         curY -= REGION_GAP;
     });
 
-    // Right side y-centers (evenly distributed gaps, but thickness is d.h)
     let rightGap = (height - 40 - actualBandTotal) / (N - 1);
     let rightCurY = height - 20;
     df.slice().reverse().forEach(d => {
@@ -180,12 +251,32 @@ function renderSection2(data) {
         rightCurY -= (d.h + rightGap);
     });
 
-    // DRAW SANKEY
-    const sankeyLeftMargin = 160; // Make room for country and region labels
+    // 3. DEFINE GRADIENTS (Gradients with Country Shading)
+    const defs = svg.append("defs");
+    df.forEach((d, i) => {
+        const gradientId = `grad-${i}`;
+        const regionCol = REGION_COLORS[d.region] || COLORS.muted;
+        
+        // Cari urutan negara di regionnya untuk shading
+        const regionIndex = df.filter(row => row.region === d.region).indexOf(d);
+        const countryCol = getCountryColor(d.country, d.region, regionIndex);
+        const isIndonesia = d.country === 'Indonesia';
+
+        const grad = defs.append("linearGradient")
+            .attr("id", gradientId)
+            .attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "0%");
+
+        grad.append("stop").attr("offset", "5%").attr("stop-color", regionCol);
+        grad.append("stop").attr("offset", "50%").attr("stop-color", isIndonesia ? COLORS.red : regionCol);
+        grad.append("stop").attr("offset", "100%").attr("stop-color", countryCol);
+    });
+
+    // 4. DRAW SANKEY
+    const sankeyLeftMargin = 160;
     const sankeyG = svg.append("g").attr("transform", `translate(${sankeyLeftMargin},0)`);
     const sankeyInnerW = sankeyW - sankeyLeftMargin;
 
-    // Draw region labels and brackets
+    // Region Labels
     regionsInOrder.forEach(reg => {
         let regRows = df.filter(d => d.region === reg);
         let topY = d3.min(regRows, d => d.left_yt);
@@ -194,136 +285,122 @@ function renderSection2(data) {
         let rc = REGION_COLORS[reg] || COLORS.muted;
 
         sankeyG.append("line")
-            .attr("x1", -30) // Moved closer to band (was -80)
-            .attr("x2", -30)
-            .attr("y1", botY)
-            .attr("y2", topY)
-            .attr("stroke", rc)
-            .attr("stroke-width", 4)
-            .attr("stroke-linecap", "round");
+            .attr("x1", -30).attr("x2", -30).attr("y1", botY).attr("y2", topY)
+            .attr("stroke", rc).attr("stroke-width", 4).attr("stroke-linecap", "round");
 
         sankeyG.append("text")
-            .attr("x", -40) // Moved closer to bracket (was -90)
-            .attr("y", midY)
-            .attr("fill", rc)
-            .attr("font-size", "13px")
-            .attr("font-weight", "800")
-            .attr("text-anchor", "end")
-            .attr("alignment-baseline", "middle")
-            .style("letter-spacing", "2px")
-            .text(reg.toUpperCase());
+            .attr("x", -40).attr("y", midY).attr("fill", rc).attr("font-size", "13px").attr("font-weight", "800")
+            .attr("text-anchor", "end").attr("alignment-baseline", "middle")
+            .style("letter-spacing", "2px").text(reg.toUpperCase());
     });
 
     const tooltip = d3.select("#tooltip");
 
-    df.forEach(d => {
+    df.forEach((d, i) => {
         let xl = 0;
         let xr = sankeyInnerW;
-        let c1 = xl + (xr - xl) * 0.4;
-        let c2 = xl + (xr - xl) * 0.6;
-        let col = getCountryColor(d.country, d.region);
-
-        let pathData = `M ${xl} ${d.left_yb} 
-                        C ${c1} ${d.left_yb}, ${c2} ${d.right_yb}, ${xr} ${d.right_yb}
-                        L ${xr} ${d.right_yt}
-                        C ${c2} ${d.right_yt}, ${c1} ${d.left_yt}, ${xl} ${d.left_yt} Z`;
-
-        let band = sankeyG.append("path")
-            .attr("d", pathData)
-            .attr("fill", col)
-            .attr("opacity", 0.72)
-            .attr("class", "sankey-link");
-
-        band.on("mouseover", function(e) {
-            d3.select(this).attr("opacity", 0.95);
-            tooltip.style("opacity", 1)
-                   .html(`<b>${d.country}</b><br>GDP: $${d.gdp_per_capita.toLocaleString()}<br>Gov Strategy: ${d.ai_government_strategy.toFixed(1)}`);
-        }).on("mousemove", function(e) {
-            tooltip.style("left", (e.pageX + 15) + "px")
-                   .style("top", (e.pageY - 15) + "px");
-        }).on("mouseout", function(e) {
-            d3.select(this).attr("opacity", 0.72);
-            tooltip.style("opacity", 0);
-        });
-
-        // Country Name inside the Sankey flow band (near the right edge)
-        // Scale font size based on band height, but keep it readable (min 9px, max 12px)
-        let fontSizeNum = Math.min(12, Math.max(9, d.h - 1));
-        let fs = fontSizeNum + 'px';
-        let fw = 'normal';
+        let isIndonesia = d.country === 'Indonesia';
+        const regionIndex = df.filter(row => row.region === d.region).indexOf(d);
+        const countryCol = getCountryColor(d.country, d.region, regionIndex);
         
-        // Country label
-        sankeyG.append("text")
-            .attr("x", xr - 15) // Place it on the flat part of the band right before it hits the bar chart
-            .attr("y", d.right_yc)
-            .attr("fill", "#F8FAFC") // Brighter color (slate-50) so it's highly visible
-            .attr("font-size", fs)
-            .attr("font-weight", fw)
-            .attr("text-anchor", "end")
-            .attr("alignment-baseline", "middle")
-            .text(d.country);
+        let pathData = `M ${xl} ${d.left_yb} 
+                        C ${xl + (xr - xl) * 0.4} ${d.left_yb}, ${xl + (xr - xl) * 0.6} ${d.right_yb}, ${xr} ${d.right_yb}
+                        L ${xr} ${d.right_yt}
+                        C ${xl + (xr - xl) * 0.6} ${d.right_yt}, ${xl + (xr - xl) * 0.4} ${d.left_yt}, ${xl} ${d.left_yt} Z`;
 
-        // Add GDP number if band is thick enough (e.g. > 14px)
-        if (d.h > 14) {
-            let gdpFormatted = `$${Math.round(d.gdp_per_capita / 1000)}k`;
+        // Gambar aliran Sankey tanpa interaksi hover
+        sankeyG.append("path")
+            .attr("d", pathData)
+            .attr("fill", countryCol) // Warna solid sesuai permintaan sebelumnya
+            .attr("opacity", isIndonesia ? 1.0 : 0.6)
+            .attr("class", "sankey-link")
+            .style("cursor", "default"); // Menghilangkan pointer tangan
+
+        // --- MENAMPILKAN INFORMASI GDP DI AWAL BAR (SISI KIRI) ---
+        if (d.h > 15) { // Hanya tampilkan jika bar cukup tebal agar tidak berantakan
+            let gdpFormatted = `$${(d.gdp_per_capita / 1000).toFixed(1)}k`;
+            
             sankeyG.append("text")
-                .attr("x", xl + 15) // near the left edge of the band
+                .attr("x", xl + 5) // Posisi di awal aliran (kiri)
                 .attr("y", d.left_yc)
-                .attr("fill", "#334155") // matching dark gray
-                .attr("font-size", "10px")
-                .attr("font-weight", "700")
+                .attr("fill", isIndonesia ? "#FFFFFF" : "#d1d3d4") // Putih untuk Indo agar kontras
+                .attr("font-size", "9px")
+                .attr("font-weight", isIndonesia ? "700" : "400")
                 .attr("text-anchor", "start")
                 .attr("alignment-baseline", "middle")
+                .style("pointer-events", "none")
                 .text(gdpFormatted);
         }
+
+        // Label Nama Negara (Tetap di sisi kanan aliran)
+        sankeyG.append("text")
+            .attr("x", xr - 15)
+            .attr("y", d.right_yc)
+            .attr("fill", isIndonesia ? "#FFFFFF" : COLORS.textMain) // Merah untuk Indo di Light Mode
+            .attr("font-size", isIndonesia ? "10px" : "9px")
+            .attr("font-weight", isIndonesia ? "600" : "200")
+            .attr("text-anchor", "end")
+            .attr("alignment-baseline", "middle")
+            .style("pointer-events", "none")
+            .text(d.country);
     });
 
-    // DRAW BAR (Connected perfectly to Sankey)
+    // 5. DRAW BAR CHART
     const barG = svg.append("g").attr("transform", `translate(${sankeyLeftMargin + sankeyInnerW}, 0)`);
-    const barInnerW = barW - 10;
-    const maxBar = 100;
-    const xScaleBar = d3.scaleLinear().domain([0, maxBar]).range([0, barInnerW]);
+    const xScaleBar = d3.scaleLinear().domain([0, 100]).range([0, barW - 10]);
 
     df.forEach(d => {
-        let col = getCountryColor(d.country, d.region);
+        const regionIndex = df.filter(row => row.region === d.region).indexOf(d);
+        const col = getCountryColor(d.country, d.region, regionIndex);
+        let isIndonesia = d.country === 'Indonesia';
         
-        // Bar
         barG.append("rect")
-            .attr("x", 0)
-            .attr("y", d.right_yt)
+            .attr("x", 0).attr("y", d.right_yt)
             .attr("width", xScaleBar(d.ai_government_strategy))
-            .attr("height", d.h) // match Sankey height perfectly
-            .attr("fill", col)
-            .attr("opacity", 0.88);
+            .attr("height", d.h).attr("fill", col)
+            .attr("opacity", isIndonesia ? 1.0 : 0.7);
 
-        // Value text
         barG.append("text")
-            .attr("x", xScaleBar(d.ai_government_strategy) + 8)
-            .attr("y", d.right_yc)
-            .attr("fill", COLORS.textDim)
-            .attr("font-size", "10px")
+            .attr("x", xScaleBar(d.ai_government_strategy) + 8).attr("y", d.right_yc)
+            .attr("fill", isIndonesia ? COLORS.red : col)
+            .attr("font-size", "10px").attr("font-weight", isIndonesia ? "bold" : "normal")
             .attr("alignment-baseline", "middle")
             .text(Math.round(d.ai_government_strategy));
     });
 
-    // DRAW BUBBLE / SCORE
-    const bubG = svg.append("g").attr("transform", `translate(${sankeyLeftMargin + sankeyInnerW + barInnerW + 40}, 0)`);
-    const maxScore = d3.max(df, d => d.ai_overall_score);
-    const radScale = d3.scaleSqrt().domain([0, maxScore]).range([3, 16]); // Fixed max radius to avoid overlaps with variable row heights
+    // 6. DRAW BUBBLES
+    const bubG = svg.append("g").attr("transform", `translate(${sankeyLeftMargin + sankeyInnerW + (barW - 10) + 40}, 0)`);
+    const radScale = d3.scaleSqrt().domain([0, d3.max(df, d => d.ai_overall_score)]).range([7, 32]);
+    const bubbleNodes = df.map(d => ({
+        data: d,
+        r: radScale(d.ai_overall_score),
+        y0: d.right_yc,
+        y: keepBubbleInsideColumn(d.right_yc, radScale(d.ai_overall_score), 12, height - 12)
+    }));
 
-    df.forEach(d => {
-        let col = getCountryColor(d.country, d.region);
-        let r = radScale(d.ai_overall_score);
-        
+    bubbleNodes.forEach(node => {
+        const d = node.data;
+        const regionIndex = df.filter(row => row.region === d.region).indexOf(d);
+        const col = getCountryColor(d.country, d.region, regionIndex);
+        let isIndonesia = d.country === 'Indonesia';
+
         bubG.append("circle")
-            .attr("cx", bubW/2)
-            .attr("cy", d.right_yc)
-            .attr("r", r)
+            .attr("cx", bubW / 2)
+            .attr("cy", node.y)
+            .attr("r", node.r)
             .attr("fill", col)
-            .attr("fill-opacity", 0.4)
+            .attr("fill-opacity", isIndonesia ? 0.72 : 0.32)
             .attr("stroke", col)
-            .attr("stroke-width", 2);
+            .attr("stroke-width", isIndonesia ? 2.2 : 1.2);
     });
+
+    const indo = df.find(d => d.country === "Indonesia");
+    if (indo) {
+        drawInsightOval(svg, sankeyLeftMargin + sankeyInnerW + barW * 0.76, indo.right_yc, [
+            "Strategi nasional",
+            "masih tertinggal"
+        ], { rx: 120, ry: 34, fontSize: 12 });
+    }
 }
 
 function renderSection3(data) {
@@ -341,7 +418,10 @@ function renderSection3(data) {
     const legendContainer = d3.select("#pillar-legend");
     PILLARS.forEach(p => {
         let item = legendContainer.append("div").attr("class", "legend-item");
-        item.append("div").attr("class", "legend-color").style("background-color", p.color);
+        item.append("div")
+            .attr("class", "legend-icon")
+            .style("color", p.color)
+            .html(getPillarIcon(p.icon));
         item.append("div").text(p.label);
     });
 
@@ -383,6 +463,13 @@ function renderSection3(data) {
                 .attr("opacity", 0.88);
             currentX += val;
         });
+
+        if (d.country === 'Indonesia') {
+            drawInsightOval(g, Math.min(x(currentX) + 138, innerW - 145), y(d.country) + y.bandwidth() / 2, [
+                "Gov. Strategy",
+                "19/100"
+            ], { rx: 96, ry: 25, fontSize: 11 });
+        }
 
         // Label
         let fw = d.country === 'Indonesia' ? 'bold' : 'normal';
@@ -476,7 +563,7 @@ function renderSection4(fpData) {
 
     const idn_radar = RADAR_AXES.map(ax => idn_row[ax] || 0);
     const adv_radar = RADAR_AXES.map(ax => eur_vals[ax] || 0);
-    const ideal_radar = [4.3, 4.2, 4.2, 4.1, 4.2, 4.0];
+    const ideal_radar = [4.3, 4.3, 4.3, 4.3, 4.3, 4.3];
     
     const labels = ['AI Literacy', 'AI Readiness', 'Confidence', 'Career Motiv.', 'Intent', 'Low Anxiety'];
 
@@ -500,10 +587,12 @@ function renderSection4(fpData) {
                 maintainAspectRatio: false,
                 scales: {
                     r: {
+                        min: 1,
+                        max: 5,
                         angleLines: { color: COLORS.muted },
                         grid: { color: COLORS.muted },
                         pointLabels: { color: COLORS.textDim, font: { size: 11, family: 'Inter' } },
-                        ticks: { display: false, min: 1, max: 5 }
+                        ticks: { display: false, stepSize: 1 }
                     }
                 },
                 plugins: {
