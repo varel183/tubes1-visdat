@@ -3,29 +3,29 @@ const COLORS = {
     bg: '#0D1B2E',
     panelBg: '#1E293B',
     textMain: '#F1F5F9',
-    textDim: '#B6C4D8',
+    textDim: '#d0d8e3',
     accent: '#FBBF24',
     red: '#E24B4A',
-    muted: '#58708E',
+    muted: '#828c9b',
     blue: '#378ADD'
 };
 
-const COUNTRY_COLORS = {
-    'Indonesia'     : '#E24B4A',
-    'Singapore'     : '#5B9BD5',
-    'Brazil'        : '#1D9E75',
-    'India'         : '#E8A838',
-    'United States' : '#60A5FA',
-    'China'         : '#F87171',
-    'Germany'       : '#A78BFA',
-    'United Kingdom': '#34D399',
-    'France'        : '#FB923C',
-    'Finland'       : '#38BDF8',
-    'Japan'         : '#F9A8D4',
-    'South Korea'   : '#86EFAC',
-    'Canada'        : '#67E8F9',
-    'Australia'     : '#FCD34D',
-};
+// const COUNTRY_COLORS = {
+//     'Indonesia'     : '#E24B4A',
+//     'Singapore'     : '#5B9BD5',
+//     'Brazil'        : '#1D9E75',
+//     'India'         : '#E8A838',
+//     'United States' : '#60A5FA',
+//     'China'         : '#F87171',
+//     'Germany'       : '#A78BFA',
+//     'United Kingdom': '#34D399',
+//     'France'        : '#FB923C',
+//     'Finland'       : '#38BDF8',
+//     'Japan'         : '#F9A8D4',
+//     'South Korea'   : '#86EFAC',
+//     'Canada'        : '#67E8F9',
+//     'Australia'     : '#FCD34D',
+// };
 
 const REGION_COLORS = {
     'Asia'     : '#ad7efd',
@@ -64,9 +64,6 @@ function getCountryColor(country, region, index = 0) {
     
     let baseColor = REGION_COLORS[region];
     let color = d3.hsl(baseColor);
-    
-    // Variasi kecerahan: makin besar index, makin terang/gelap
-    color.l += (index % 10) * 0.02 - 0.1;
     
     return color.toString();
 }
