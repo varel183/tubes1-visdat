@@ -65,9 +65,6 @@ function getCountryColor(country, region, index = 0) {
     let baseColor = REGION_COLORS[region];
     let color = d3.hsl(baseColor);
     
-    // Variasi kecerahan: makin besar index, makin terang/gelap
-    color.l += (index % 10) * 0.02 - 0.1;
-    
     return color.toString();
 }
 
