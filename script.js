@@ -84,9 +84,8 @@ function getPillarIcon(type) {
 function drawInsightOval(g, x, y, lines, options = {}) {
     const rx = options.rx || 115;
     const ry = options.ry || 38;
-    const textColor = options.textColor || '#6F7F94';
-    const strokeColor = options.strokeColor || '#2B3A4E';
-    const fontSize = options.fontSize || 12;
+    const textColor = options.textColor || '#ffffff';
+    const fontSize = options.fontSize || 16;
 
     const group = g.append("g").attr("class", "insight-oval");
     group.append("ellipse")
@@ -95,9 +94,7 @@ function drawInsightOval(g, x, y, lines, options = {}) {
         .attr("rx", rx)
         .attr("ry", ry)
         .attr("fill", "transparent")
-        .attr("stroke", strokeColor)
         .attr("stroke-width", 1.4)
-        .attr("stroke-dasharray", "5 6")
         .attr("stroke-opacity", 0.78);
 
     lines.forEach((line, i) => {
@@ -394,13 +391,13 @@ function renderSection2(data) {
             .attr("stroke-width", isIndonesia ? 2.2 : 1.2);
     });
 
-    const indo = df.find(d => d.country === "Indonesia");
-    if (indo) {
-        drawInsightOval(svg, sankeyLeftMargin + sankeyInnerW + barW * 0.76, indo.right_yc, [
-            "Strategi nasional",
-            "masih tertinggal"
-        ], { rx: 120, ry: 34, fontSize: 12 });
-    }
+    // const indo = df.find(d => d.country === "Indonesia");
+    // if (indo) {
+    //     drawInsightOval(svg, sankeyLeftMargin + sankeyInnerW + barW * 0.76, indo.right_yc, [
+    //         "Strategi nasional",
+    //         "masih tertinggal"
+    //     ], { rx: 120, ry: 34, fontSize: 14 });
+    // }
 }
 
 function renderSection3(data) {
@@ -434,7 +431,7 @@ function renderSection3(data) {
         .attr("width", width)
         .attr("height", height);
 
-    const margin = {top: 20, right: 20, bottom: 20, left: 100};
+    const margin = {top: 20, right: 20, bottom: 20, left: 120};
     const innerW = width - margin.left - margin.right;
     const innerH = height - margin.top - margin.bottom;
 
@@ -464,12 +461,12 @@ function renderSection3(data) {
             currentX += val;
         });
 
-        if (d.country === 'Indonesia') {
-            drawInsightOval(g, Math.min(x(currentX) + 138, innerW - 145), y(d.country) + y.bandwidth() / 2, [
-                "Gov. Strategy",
-                "19/100"
-            ], { rx: 96, ry: 25, fontSize: 11 });
-        }
+        // if (d.country === 'Indonesia') {
+        //     drawInsightOval(g, Math.min(x(currentX) + 138, innerW - 145), y(d.country) + y.bandwidth() / 2, [
+        //         "Gov. Strategy",
+        //         "19/100"
+        //     ], { rx: 96, ry: 25, fontSize: 14 });
+        // }
 
         // Label
         let fw = d.country === 'Indonesia' ? 'bold' : 'normal';

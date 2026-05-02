@@ -161,7 +161,7 @@ ax_hook.text(0.5, 0.60,
     fontsize=30, fontweight='bold', color='#E24B4A')
 
 cards = [
-    ('9/100',  'AI Score',                  0.18),
+    ('39/100',  'AI Score',                  0.18),
     ('#39',    'Global Rank',               0.50),
     ('9 Juta', 'Tech workers needed 2030',  0.82),
 ]

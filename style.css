@@ -1,5 +1,5 @@
 :root {
-    --bg-color: #0D1B2E;
+    --bg-color: #0e1c2f;
     --panel-bg: #1E293B;
     --text-main: #F1F5F9;
     --text-dim: #d0d8e3;
@@ -17,21 +17,22 @@
     padding: 0;
 }
 
+
+
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-main);
     display: flex;
     justify-content: center;
-    padding: 60px 0;
+    padding: 0 0;
 }
 
 .poster-container {
-    width: 1400px;
+    width: 100%;
     background-color: var(--bg-color);
     display: flex;
     flex-direction: column;
-    gap: 70px;
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -39,15 +40,19 @@ body {
 
 .poster-container::before {
     content: "";
+    width: 100%;
+    height: 100%;
     position: absolute;
     inset: 0;
     /* Pastikan gambar disimpan dengan nama 'bg.jpg' di folder yang sama */
-    background-image: url('image.png');
+    background-image: url('bg.jpg');
     background-size: cover;
     background-position: center top;
-    opacity: 0.15; /* Sesuaikan angka ini (0.1 - 0.3) agar tidak menabrak teks */
+    opacity: 0.05; /* Sesuaikan angka ini (0.1 - 0.3) agar tidak menabrak teks */
     z-index: -1;
     pointer-events: none;
+    margin: 20px;
+    padding: 20px;
 }
 
 .poster-container > section {
@@ -107,7 +112,7 @@ body {
 /* --- SECTION 1: HOOK --- */
 .hook-section {
     text-align: center;
-    padding-top: 20px;
+    padding-top: 70px;
 }
 .hook-title {
     font-size: 46px;
@@ -137,17 +142,16 @@ body {
 }
 .narrative-strip {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    line-height: 1.5;
     gap: 22px;
     margin: 44px auto 0;
-    max-width: 1180px;
-    text-align: left;
+    max-width: 80%;
+    text-align: justify;
+    font-size: 20px;
+    color: var(--text-dim);
 }
 .story-beat {
-    display: grid;
-    grid-template-columns: 44px 1fr;
-    gap: 14px;
-    align-items: start;
+    display: block;
     padding-top: 18px;
     border-top: 1px solid rgba(148, 163, 184, 0.35);
 }
@@ -159,9 +163,9 @@ body {
 }
 .story-beat p {
     color: #E2E8F0;
-    font-size: 17px;
+    font-size: 20px;
     line-height: 1.42;
-    font-weight: 600;
+    font-weight: 400;
 }
 
 /* --- SECTION 2: FLOW --- */
@@ -174,7 +178,7 @@ body {
     width: 78%;
     margin: 0 auto 10px;
     color: var(--text-dim);
-    font-size: 17px;
+    font-size: 20px;
     line-height: 1.5;
     text-align: center;
 }
@@ -262,6 +266,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 30px;
 }
 .section-title {
     font-size: 18px;
@@ -319,6 +324,7 @@ body {
 #pillars-chart {
     width: 100%;
     height: 520px;
+    padding: 30px;
 }
 
 /* --- SECTION 4: RADAR --- */
@@ -368,28 +374,30 @@ body {
     max-width: 1080px;
     margin: 36px auto 0;
     padding: 20px 28px;
-    border: 1px dashed rgba(43, 58, 78, 0.8);
-    border-radius: 999px;
     background: transparent;
-    color: #78879A;
-    text-align: center;
+    color: var(--text-dim);
+    text-align: justify;
 }
 .radar-insight p {
-    font-size: 19px;
+    font-size: 22px;
     line-height: 1.45;
-    font-weight: 600;
+    font-weight: 400;
 }
 
 /* --- SECTION 5: CTA --- */
 .cta-section {
     text-align: center;
-    padding-bottom: 60px;
-    margin-top: 40px;
+    padding: 40px;
 }
+
+.cta-section p{
+    text-align: center;
+    font-size: 16px;
+}
+
 .cta-quote {
     font-size: 28px;
-    font-style: italic;
-    font-weight: 700;
+    font-weight: 600;
     margin-bottom: 25px;
 }
 .cta-sub {
@@ -399,6 +407,7 @@ body {
     line-height: 1.45;
 }
 .footer-sources {
+    margin-top: 60px;
     font-size: 13px;
     color: rgba(182, 196, 216, 0.36);
 }
@@ -418,3 +427,26 @@ body {
     transition: opacity 0.2s;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
+
+/* font */
+.michroma-regular {
+  font-family: "Michroma", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.gloock-regular {
+  font-family: "Gloock", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.google-sans{
+  font-family: "Google Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight:400;
+  font-style: normal;
+  font-variation-settings:
+    "GRAD" 0;
+}
+
