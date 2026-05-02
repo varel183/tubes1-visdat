@@ -3,10 +3,10 @@ const COLORS = {
     bg: '#0D1B2E',
     panelBg: '#1E293B',
     textMain: '#F1F5F9',
-    textDim: '#94A3B8',
+    textDim: '#B6C4D8',
     accent: '#FBBF24',
     red: '#E24B4A',
-    muted: '#334155',
+    muted: '#58708E',
     blue: '#378ADD'
 };
 
@@ -37,12 +37,12 @@ const REGION_COLORS = {
 };
 
 const PILLARS = [
-    {key: 'ai_talent', label: 'Talent', color: '#483AA0'},
-    {key: 'ai_infrastructure', label: 'Infrastructure', color: '#8ACBD0'},
-    {key: 'ai_government_strategy', label: 'Gov. Strategy', color: '#093C5D'},
-    {key: 'ai_research', label: 'Research', color: '#0992C2'},
-    {key: 'ai_development', label: 'Development', color: '#3B38A0'},
-    {key: 'ai_commercial', label: 'Commercial', color: '#BBD5DA'},
+    {key: 'ai_talent', label: 'Talent', color: '#7C5CFF', icon: 'talent'},
+    {key: 'ai_infrastructure', label: 'Infrastructure', color: '#7DD3FC', icon: 'infra'},
+    {key: 'ai_government_strategy', label: 'Gov. Strategy', color: '#FBBF24', icon: 'strategy'},
+    {key: 'ai_research', label: 'Research', color: '#22D3EE', icon: 'research'},
+    {key: 'ai_development', label: 'Development', color: '#34D399', icon: 'development'},
+    {key: 'ai_commercial', label: 'Commercial', color: '#CBD5E1', icon: 'commercial'},
 ];
 
 const REGION_MAP = {
@@ -69,6 +69,91 @@ function getCountryColor(country, region, index = 0) {
     color.l += (index % 10) * 0.02 - 0.1;
     
     return color.toString();
+}
+
+function getPillarIcon(type) {
+    const icons = {
+        talent: '<svg viewBox="0 0 24 24"><path d="M8 19v-2a4 4 0 0 1 8 0v2"/><circle cx="12" cy="8" r="4"/><path d="M4 21h16"/></svg>',
+        infra: '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="6" rx="2"/><rect x="5" y="14" width="14" height="6" rx="2"/><path d="M8 7h.01M8 17h.01M12 10v4"/></svg>',
+        strategy: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l4 2"/><path d="M4 20l3-3M20 4l-3 3"/></svg>',
+        research: '<svg viewBox="0 0 24 24"><path d="M10 4v6l-5 8a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-8V4"/><path d="M8 4h8M8 15h8"/></svg>',
+        development: '<svg viewBox="0 0 24 24"><path d="M8 17l-5-5 5-5M16 7l5 5-5 5"/><path d="M14 4l-4 16"/></svg>',
+        commercial: '<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z"/><path d="M9 8a3 3 0 0 1 6 0"/><path d="M8 13h8"/></svg>',
+    };
+
+    return icons[type] || icons.strategy;
+}
+
+function drawInsightOval(g, x, y, lines, options = {}) {
+    const rx = options.rx || 115;
+    const ry = options.ry || 38;
+    const textColor = options.textColor || '#6F7F94';
+    const strokeColor = options.strokeColor || '#2B3A4E';
+    const fontSize = options.fontSize || 12;
+
+    const group = g.append("g").attr("class", "insight-oval");
+    group.append("ellipse")
+        .attr("cx", x)
+        .attr("cy", y)
+        .attr("rx", rx)
+        .attr("ry", ry)
+        .attr("fill", "transparent")
+        .attr("stroke", strokeColor)
+        .attr("stroke-width", 1.4)
+        .attr("stroke-dasharray", "5 6")
+        .attr("stroke-opacity", 0.78);
+
+    lines.forEach((line, i) => {
+        const offset = (i - (lines.length - 1) / 2) * fontSize * 1.25;
+        group.append("text")
+            .attr("x", x)
+            .attr("y", y + offset)
+            .attr("fill", textColor)
+            .attr("font-size", `${fontSize}px`)
+            .attr("font-weight", 700)
+            .attr("text-anchor", "middle")
+            .attr("alignment-baseline", "middle")
+            .style("letter-spacing", "0px")
+            .text(line);
+    });
+}
+
+function resolveBubblePositions(nodes, topLimit, bottomLimit, padding = 5) {
+    nodes.sort((a, b) => a.y0 - b.y0);
+
+    nodes.forEach(node => {
+        node.y = Math.max(topLimit + node.r, Math.min(bottomLimit - node.r, node.y0));
+    });
+
+    for (let pass = 0; pass < 3; pass++) {
+        for (let i = 1; i < nodes.length; i++) {
+            const prev = nodes[i - 1];
+            const node = nodes[i];
+            const minY = prev.y + prev.r + node.r + padding;
+            if (node.y < minY) node.y = minY;
+        }
+
+        const overflow = nodes[nodes.length - 1].y + nodes[nodes.length - 1].r - bottomLimit;
+        if (overflow > 0) {
+            nodes.forEach(node => { node.y -= overflow; });
+        }
+
+        for (let i = nodes.length - 2; i >= 0; i--) {
+            const next = nodes[i + 1];
+            const node = nodes[i];
+            const maxY = next.y - next.r - node.r - padding;
+            if (node.y > maxY) node.y = maxY;
+        }
+
+        const underflow = topLimit - (nodes[0].y - nodes[0].r);
+        if (underflow > 0) {
+            nodes.forEach(node => { node.y += underflow; });
+        }
+    }
+}
+
+function keepBubbleInsideColumn(y, r, topLimit, bottomLimit) {
+    return Math.max(topLimit + r, Math.min(bottomLimit - r, y));
 }
 
 Promise.all([
@@ -288,18 +373,37 @@ function renderSection2(data) {
 
     // 6. DRAW BUBBLES
     const bubG = svg.append("g").attr("transform", `translate(${sankeyLeftMargin + sankeyInnerW + (barW - 10) + 40}, 0)`);
-    const radScale = d3.scaleSqrt().domain([0, d3.max(df, d => d.ai_overall_score)]).range([3, 16]);
+    const radScale = d3.scaleSqrt().domain([0, d3.max(df, d => d.ai_overall_score)]).range([7, 32]);
+    const bubbleNodes = df.map(d => ({
+        data: d,
+        r: radScale(d.ai_overall_score),
+        y0: d.right_yc,
+        y: keepBubbleInsideColumn(d.right_yc, radScale(d.ai_overall_score), 12, height - 12)
+    }));
 
-    df.forEach(d => {
+    bubbleNodes.forEach(node => {
+        const d = node.data;
         const regionIndex = df.filter(row => row.region === d.region).indexOf(d);
         const col = getCountryColor(d.country, d.region, regionIndex);
         let isIndonesia = d.country === 'Indonesia';
-        
+
         bubG.append("circle")
-            .attr("cx", bubW/2).attr("cy", d.right_yc).attr("r", radScale(d.ai_overall_score))
-            .attr("fill", col).attr("fill-opacity", isIndonesia ? 0.7 : 0.3)
-            .attr("stroke", col).attr("stroke-width", isIndonesia ? 2 : 1);
+            .attr("cx", bubW / 2)
+            .attr("cy", node.y)
+            .attr("r", node.r)
+            .attr("fill", col)
+            .attr("fill-opacity", isIndonesia ? 0.72 : 0.32)
+            .attr("stroke", col)
+            .attr("stroke-width", isIndonesia ? 2.2 : 1.2);
     });
+
+    const indo = df.find(d => d.country === "Indonesia");
+    if (indo) {
+        drawInsightOval(svg, sankeyLeftMargin + sankeyInnerW + barW * 0.76, indo.right_yc, [
+            "Strategi nasional",
+            "masih tertinggal"
+        ], { rx: 120, ry: 34, fontSize: 12 });
+    }
 }
 
 function renderSection3(data) {
@@ -317,7 +421,10 @@ function renderSection3(data) {
     const legendContainer = d3.select("#pillar-legend");
     PILLARS.forEach(p => {
         let item = legendContainer.append("div").attr("class", "legend-item");
-        item.append("div").attr("class", "legend-color").style("background-color", p.color);
+        item.append("div")
+            .attr("class", "legend-icon")
+            .style("color", p.color)
+            .html(getPillarIcon(p.icon));
         item.append("div").text(p.label);
     });
 
@@ -359,6 +466,13 @@ function renderSection3(data) {
                 .attr("opacity", 0.88);
             currentX += val;
         });
+
+        if (d.country === 'Indonesia') {
+            drawInsightOval(g, Math.min(x(currentX) + 138, innerW - 145), y(d.country) + y.bandwidth() / 2, [
+                "Gov. Strategy",
+                "19/100"
+            ], { rx: 96, ry: 25, fontSize: 11 });
+        }
 
         // Label
         let fw = d.country === 'Indonesia' ? 'bold' : 'normal';
@@ -452,7 +566,7 @@ function renderSection4(fpData) {
 
     const idn_radar = RADAR_AXES.map(ax => idn_row[ax] || 0);
     const adv_radar = RADAR_AXES.map(ax => eur_vals[ax] || 0);
-    const ideal_radar = [4.3, 4.2, 4.2, 4.1, 4.2, 4.0];
+    const ideal_radar = [4.3, 4.3, 4.3, 4.3, 4.3, 4.3];
     
     const labels = ['AI Literacy', 'AI Readiness', 'Confidence', 'Career Motiv.', 'Intent', 'Low Anxiety'];
 
@@ -476,10 +590,12 @@ function renderSection4(fpData) {
                 maintainAspectRatio: false,
                 scales: {
                     r: {
+                        min: 1,
+                        max: 5,
                         angleLines: { color: COLORS.muted },
                         grid: { color: COLORS.muted },
                         pointLabels: { color: COLORS.textDim, font: { size: 11, family: 'Inter' } },
-                        ticks: { display: false, min: 1, max: 5 }
+                        ticks: { display: false, stepSize: 1 }
                     }
                 },
                 plugins: {
