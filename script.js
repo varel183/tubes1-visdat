@@ -37,12 +37,12 @@ const REGION_COLORS = {
 };
 
 const PILLARS = [
-    {key: 'ai_talent', label: 'Talent', color: '#818CF8'},
-    {key: 'ai_infrastructure', label: 'Infrastructure', color: '#38BDF8'},
-    {key: 'ai_government_strategy', label: 'Gov. Strategy', color: '#34D399'},
-    {key: 'ai_research', label: 'Research', color: '#FBBF24'},
-    {key: 'ai_development', label: 'Development', color: '#F472B6'},
-    {key: 'ai_commercial', label: 'Commercial', color: '#fdd142'},
+    {key: 'ai_talent', label: 'Talent', color: '#483AA0'},
+    {key: 'ai_infrastructure', label: 'Infrastructure', color: '#8ACBD0'},
+    {key: 'ai_government_strategy', label: 'Gov. Strategy', color: '#093C5D'},
+    {key: 'ai_research', label: 'Research', color: '#0992C2'},
+    {key: 'ai_development', label: 'Development', color: '#3B38A0'},
+    {key: 'ai_commercial', label: 'Commercial', color: '#BBD5DA'},
 ];
 
 const REGION_MAP = {
@@ -119,15 +119,7 @@ function renderSection2(data) {
     let selectedNames = new Set([...top12, ...asean, ...peers]);
     let df = data.filter(d => selectedNames.has(d.country));
 
-    const REGION_ORDER = ['Americas','Asia','Europe','Africa','Oceania','Others'];
-    df.sort((a, b) => {
-        let riA = REGION_ORDER.indexOf(a.region);
-        let riB = REGION_ORDER.indexOf(b.region);
-        if (riA === -1) riA = 99;
-        if (riB === -1) riB = 99;
-        if (riA !== riB) return riA - riB;
-        return b.gdp_per_capita - a.gdp_per_capita;
-    });
+    df.sort((a, b) => b.gdp_per_capita - a.gdp_per_capita);
 
     const N = df.length;
     const TOTAL_GDP = d3.sum(df, d => d.gdp_per_capita);
@@ -143,7 +135,11 @@ function renderSection2(data) {
     const bubW = width * 0.15;
     const REGION_GAP = 50;
     
-    let regionsInOrder = [...new Set(df.map(d => d.region))];
+    const REGION_ORDER = ['Americas', 'Europe','Asia',  'Oceania', 'Others', 'Africa',];
+    let uniqueRegions = [...new Set(df.map(d => d.region))];
+    let regionsInOrder = uniqueRegions.sort((a, b) => 
+        REGION_ORDER.indexOf(a) - REGION_ORDER.indexOf(b)
+    );
     let gapBudget = regionsInOrder.length * REGION_GAP;
     let bandBudget = height - gapBudget - 40;
 
