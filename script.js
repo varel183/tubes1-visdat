@@ -22,7 +22,7 @@ const REGION_COLORS = {
 const PILLARS = [
     {key: 'ai_talent',              label: 'Talent',      color: '#7C5CFF', icon: 'talent'},
     {key: 'ai_infrastructure',      label: 'Infrastructure', color: '#7DD3FC', icon: 'infra'},
-    {key: 'ai_government_strategy', label: 'Gov. Strategy',  color: '#FBBF24', icon: 'strategy'},
+    {key: 'ai_government_strategy', label: 'Gov. Strategy',  color: '#fc9f52', icon: 'strategy'},
     {key: 'ai_research',            label: 'Research',    color: '#22D3EE', icon: 'research'},
     {key: 'ai_development',         label: 'Development', color: '#34D399', icon: 'development'},
     {key: 'ai_commercial',          label: 'Commercial',  color: '#CBD5E1', icon: 'commercial'},
@@ -484,12 +484,12 @@ function renderSection4(fpData) {
                 datasets: [{
                     label,
                     data: dataVals,
-                    backgroundColor: color + '40',
+                    backgroundColor: color + '90',
                     borderColor: color,
                     borderWidth: 2,
                     borderDash: dash,
                     pointBackgroundColor: color,
-                    pointRadius: 0
+                    pointRadius: 4
                 }]
             },
             options: {
