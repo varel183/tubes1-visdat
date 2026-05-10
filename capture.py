@@ -15,7 +15,7 @@ try:
             print("Failed to launch Edge. Please run: playwright install chromium")
             raise e
             
-        page = browser.new_page(viewport={"width": 1400, "height": 3200}, device_scale_factor=2)
+        page = browser.new_page(viewport={"width": 1400, "height": 1400}, device_scale_factor=2)
         print("Navigating to index.html...")
         page.goto("http://localhost:8089/index.html", wait_until="networkidle")
         

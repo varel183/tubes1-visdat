@@ -23,7 +23,7 @@ body {
     color: var(--text-main);
     display: flex;
     justify-content: center;
-    padding: 60px 0;
+    padding: 15px 0;
 }
 
 .poster-container {
@@ -31,7 +31,7 @@ body {
     background-color: var(--bg-color);
     display: flex;
     flex-direction: column;
-    gap: 70px;
+    gap: 20px;
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -107,18 +107,18 @@ body {
 /* --- SECTION 1: HOOK --- */
 .hook-section {
     text-align: center;
-    padding-top: 20px;
+    padding-top: 6px;
 }
 .hook-title {
-    font-size: 46px;
+    font-size: 32px;
     font-weight: 800;
-    line-height: 1.3;
-    margin-bottom: 20px;
+    line-height: 1.25;
+    margin-bottom: 10px;
 }
 .stats-container {
     display: flex;
     justify-content: space-evenly;
-    margin-top: 50px;
+    margin-top: 14px;
 }
 .stat-card {
     display: flex;
@@ -126,22 +126,22 @@ body {
     align-items: center;
 }
 .stat-value {
-    font-size: 56px;
+    font-size: 32px;
     font-weight: 800;
 }
 .stat-label {
-    font-size: 15px;
+    font-size: 12px;
     color: var(--text-dim);
-    margin-top: 8px;
+    margin-top: 6px;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.2px;
 }
 .narrative-strip {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 22px;
-    margin: 44px auto 0;
-    max-width: 1180px;
+    gap: 12px;
+    margin: 14px auto 0;
+    max-width: 1000px;
     text-align: left;
 }
 .story-beat {
@@ -149,19 +149,19 @@ body {
     grid-template-columns: 44px 1fr;
     gap: 14px;
     align-items: start;
-    padding-top: 18px;
+    padding-top: 10px;
     border-top: 1px solid rgba(148, 163, 184, 0.35);
 }
 .beat-number {
     color: var(--accent);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 800;
     letter-spacing: 1px;
 }
 .story-beat p {
     color: #E2E8F0;
-    font-size: 17px;
-    line-height: 1.42;
+    font-size: 15px;
+    line-height: 1.38;
     font-weight: 600;
 }
 
@@ -169,32 +169,32 @@ body {
 .flow-section {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
 }
 .section-narrative {
     width: 78%;
-    margin: 0 auto 10px;
+    margin: 0 auto 8px;
     color: var(--text-dim);
-    font-size: 17px;
-    line-height: 1.5;
+    font-size: 15px;
+    line-height: 1.45;
     text-align: center;
 }
 .section-narrative.narrow {
     width: 72%;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
 }
 .continent-key {
     width: 82%;
     margin: 2px auto 0;
-    padding: 13px 22px;
+    padding: 8px 16px;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 22px;
+    gap: 16px;
     border-top: 1px solid rgba(88, 112, 142, 0.28);
     border-bottom: 1px solid rgba(88, 112, 142, 0.2);
     color: #8998AA;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
 }
 .continent-key-title {
@@ -251,25 +251,34 @@ body {
 }
 .chart-body {
     width: 100%;
-    height: 900px;
+    height: 580px;
     position: relative;
 }
 .sankey-link {
     cursor: default
 }
 
-/* --- SECTION 3: PILLARS --- */
+/* --- SECTION 3 & 4: SIDE-BY-SIDE --- */
+.sections-side-by-side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    align-items: start;
+}
+
 .pillars-section {
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-width: 0;
+    overflow: hidden;
 }
 .section-title {
     font-size: 13px;
     font-weight: 800;
     /*font-style: italic;*/
     color: var(--text-dim);
-    margin-bottom: 25px;
+    margin-bottom: 10px;
     text-align: center;
     width: 100%;
 }
@@ -277,15 +286,15 @@ body {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 16px 24px;
-    margin-bottom: 30px;
+    gap: 12px 18px;
+    margin-bottom: 12px;
     max-width: 1150px;
 }
 .legend-item {
     display: flex;
     align-items: center;
     gap: 9px;
-    font-size: 14px;
+    font-size: 12px;
     color: #E2E8F0;
 }
 .legend-color {
@@ -318,39 +327,60 @@ body {
     stroke-linejoin: round;
 }
 .pillars-chart {
-    width: 2100px;
+    width: 100%;
     /* width: 100%;
     max-width: 1100px; */
-    height: 520px;
-}
+    height: 90px;
+}}
 
 /* --- SECTION 4: RADAR --- */
 .radar-section {
-    padding: 30px 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: stretch;
+    overflow: visible;
+}
+.pillars-chart svg {
+    width: 100%;
+    height: auto;
+}
+.radar-section .section-title {
+    font-size: 12px;
+    margin-bottom: 6px;
 }
 .radar-container {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 30px;
-    align-items: center;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    align-items: start;
 }
 .radar-wrapper {
     position: relative;
-    height: 380px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.radar-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
 }
 .radar-metaphor {
     position: absolute;
-    top: 8px;
-    right: 64px;
-    width: 42px;
-    height: 42px;
+    top: 4px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
     display: grid;
     place-items: center;
     border: 1px solid currentColor;
     border-radius: 8px;
     background: rgba(15, 23, 42, 0.42);
     opacity: 0.82;
-    z-index: 2;
+    z-index: 10;
 }
 .radar-metaphor svg {
     width: 28px;
@@ -369,8 +399,8 @@ body {
 .radar-ideal .radar-metaphor { color: var(--text-dim); }
 .radar-insight {
     max-width: 1080px;
-    margin: 36px auto 0;
-    padding: 20px 28px;
+    margin: 16px auto 0;
+    padding: 16px 20px;
     border: 1px dashed rgba(43, 58, 78, 0.8);
     border-radius: 999px;
     background: transparent;
@@ -378,27 +408,27 @@ body {
     text-align: center;
 }
 .radar-insight p {
-    font-size: 19px;
-    line-height: 1.45;
+    font-size: 15px;
+    line-height: 1.4;
     font-weight: 600;
 }
 
 /* --- SECTION 5: CTA --- */
 .cta-section {
     text-align: center;
-    padding-bottom: 60px;
-    margin-top: 40px;
+    padding-bottom: 30px;
+    margin-top: 20px;
 }
 .cta-quote {
-    font-size: 28px;
+    font-size: 22px;
     font-style: italic;
     font-weight: 700;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
 .cta-sub {
-    font-size: 16px;
+    font-size: 13px;
     color: var(--accent);
-    margin-bottom: 50px;
+    margin-bottom: 30px;
     line-height: 1.45;
 }
 .footer-sources {

@@ -310,14 +310,14 @@ function renderSection2(data) {
 // ─────────────────────────────────────────────
 function renderSection3(data) {
     const SUBSET_NAMES = [
-        'United States','China','Singapore','United Kingdom','Germany',
-        'Finland','India','Brazil','Malaysia','Vietnam','Indonesia',
-        'Colombia','Nigeria'
+        'Indonesia','Singapore','India','China','United States',
+        'Germany','Brazil'
     ];
 
     let ds3 = SUBSET_NAMES
         .map(c => data.find(d => d.country === c))
-        .filter(Boolean);
+        .filter(Boolean)
+        .sort((a, b) => b.ai_overall_score - a.ai_overall_score);  // Sort descending by AI score
 
     // Legend
     const legendContainer = d3.select("#pillar-legend");
@@ -333,14 +333,14 @@ function renderSection3(data) {
     // ── FIX 1: derive height from row count ──────────────────────────
     const ROW_HEIGHT  = 32;   // px per country row
     const ROW_PADDING = 0.35; // band padding fraction (same as scaleBand)
-    const margin = { top: 20, right: 30, bottom: 20, left: 140 }; // ← FIX 2: left 140
+    const margin = { top: 20, right: 0, bottom: 20, left: 125 }; // ← FIX 2: left 140
     
 
     const innerH = ds3.length * ROW_HEIGHT / (1 - ROW_PADDING);
     const height = innerH + margin.top + margin.bottom;
 
     const container = document.getElementById("pillars-chart");
-    const width     = container.clientWidth || 1400;
+    const width     = 650;
     const innerW    = width - margin.left - margin.right;
     // ────────────────────────────────────────────────────────────────
 
@@ -355,8 +355,8 @@ function renderSection3(data) {
         .padding(ROW_PADDING);
 
     const x = d3.scaleLinear()
-        .domain([0, 600])
-        .range([0, innerW]);
+        .domain([0, 1000])
+        .range([0, innerW *1.5]);  // Bars take 50% of width
 
     const g = svg.append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -518,5 +518,4 @@ function renderSection4(fpData) {
 
     createRadar('radar1', idn_radar,   'Indonesia',     COLORS.red);
     createRadar('radar2', adv_radar,   'European Avg',  COLORS.blue);
-    createRadar('radar3', ideal_radar, 'Kondisi Ideal', COLORS.textDim, [5, 5]);
 }
