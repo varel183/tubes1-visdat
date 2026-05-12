@@ -330,24 +330,23 @@ function renderSection3(data) {
         item.append("div").text(p.label);
     });
 
-    // ── FIX 1: derive height from row count ──────────────────────────
+    // Derive height from row count so the chart stays compact in the A2 layout.
     const ROW_HEIGHT  = 32;   // px per country row
     const ROW_PADDING = 0.35; // band padding fraction (same as scaleBand)
-    const margin = { top: 20, right: 0, bottom: 20, left: 125 }; // ← FIX 2: left 140
+    const margin = { top: 18, right: 18, bottom: 18, left: 118 };
     
 
     const innerH = ds3.length * ROW_HEIGHT / (1 - ROW_PADDING);
     const height = innerH + margin.top + margin.bottom;
 
     const container = document.getElementById("pillars-chart");
-    const width     = 650;
+    const width     = container.clientWidth || 650;
     const innerW    = width - margin.left - margin.right;
-    // ────────────────────────────────────────────────────────────────
 
     const svg = d3.select("#pillars-chart")
         .append("svg")
         .attr("width", width)
-        .attr("height", height);         // ← explicit, computed height
+        .attr("height", height);
 
     const y = d3.scaleBand()
         .domain(ds3.map(d => d.country))
@@ -355,8 +354,8 @@ function renderSection3(data) {
         .padding(ROW_PADDING);
 
     const x = d3.scaleLinear()
-        .domain([0, 1000])
-        .range([0, innerW *1.5]);  // Bars take 50% of width
+        .domain([0, 600])
+        .range([0, innerW]);
 
     const g = svg.append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -499,7 +498,7 @@ function renderSection4(fpData) {
                         min: 1, max: 5,
                         angleLines: { color: COLORS.muted },
                         grid: { color: COLORS.muted },
-                        pointLabels: { color: COLORS.textDim, font: { size: 11, family: 'Inter' } },
+                        pointLabels: { color: COLORS.textDim, font: { size: 11, family: 'Outfit' } },
                         ticks: { display: false, stepSize: 1 }
                     }
                 },
@@ -509,7 +508,7 @@ function renderSection4(fpData) {
                         display: true,
                         text: label,
                         color,
-                        font: { size: 16, weight: 'bold', family: 'Inter' }
+                        font: { size: 16, weight: 'bold', family: 'Outfit' }
                     }
                 }
             }

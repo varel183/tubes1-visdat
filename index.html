@@ -10,7 +10,7 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
       /* ─── SOFTER CHERRY RED — readable, not blinding ─── */
@@ -45,13 +45,14 @@
         text-transform: uppercase;
         position: relative;
         display: inline-block;
+        white-space: nowrap;
       }
 
       /* Accent underline bar — red, contained glow */
       .section-title::after {
         content: '';
         display: block;
-        margin-top: 12px;
+        margin: 12px auto 0;
         height: 3px;
         width: 56px;
         background: #E8193C;
@@ -61,21 +62,22 @@
 
       /* ─── HOOK TITLE — big, dominant ─── */
       .hook-title {
-        font-size: clamp(2rem, 4.5vw, 3.4rem) !important;
+        font-size: clamp(1.9rem, 3.2vw, 2.75rem) !important;
         font-weight: 900 !important;
-        line-height: 1.14 !important;
+        line-height: 1.08 !important;
         letter-spacing: -0.03em;
+        white-space: nowrap;
       }
       .hook-title .highlight-red {
-        display: block;
-        margin-top: 6px;
+        display: inline !important;
+        margin-top: 0;
       }
 
       /* ─── HOOK SUBTITLE ─── */
       .hook-subtitle {
         font-size: clamp(0.95rem, 1.6vw, 1.15rem);
         color: rgba(232, 234, 240, 0.62);
-        margin-top: 6px;
+        margin-top: 0;
         margin-bottom: 0;
         letter-spacing: 0.01em;
         font-weight: 400;
@@ -199,6 +201,30 @@
         background: #E8193C !important;
         box-shadow: 0 0 8px rgba(232,25,60,0.45), 0 0 18px rgba(232,25,60,0.18) !important;
       }
+
+      .sections-side-by-side .section-title {
+        font-size: clamp(1.25rem, 1.45vw, 1.7rem) !important;
+        line-height: 1.06 !important;
+        white-space: nowrap;
+      }
+      .sections-side-by-side .section-title::after {
+        margin: 8px auto 0;
+        width: 46px;
+      }
+      .sections-side-by-side .section-narrative {
+        font-size: 0.92rem;
+        line-height: 1.38;
+      }
+      .sections-side-by-side .gov-strategy-callout {
+        margin-top: 4px !important;
+        padding: 9px 14px !important;
+      }
+      .sections-side-by-side .radar-insight p {
+        font-size: 0.84rem;
+      }
+      .cta-section .cta-sub strong {
+        color: rgba(232,234,240,0.92);
+      }
     </style>
 </head>
 <body>
@@ -272,8 +298,7 @@
         <section class="hook-section">
 
             <h1 class="hook-title">
-                AI Indonesia Di Mata Dunia:
-                <span class="highlight-red">Hanya Besar Sebagai Pasar, Kecil Sebagai Pemain</span>
+                AI Indonesia: <span class="highlight-red">Besar Sebagai Pasar, Kecil Sebagai Pemain</span>
             </h1>
             <p class="hook-subtitle">
                 Indonesia pakai AI lebih banyak dari Jerman tapi strategi nasionalnya tertinggal 47 peringkat.
@@ -301,15 +326,15 @@
             <div class="narrative-strip">
                 <div class="story-beat">
                     <span class="beat-number">01</span>
-                    <p>Adopsi AI di Indonesia sudah banyak, tetapi bukan berarti negara kita sudah siap</p>
+                    <p>Orang Indonesia sudah pakai AI untuk kerja, belajar, dan bikin konten. Adopsinya nyata, tapi adopsi bukan kesiapan.</p>
                 </div>
                 <div class="story-beat">
                     <span class="beat-number">02</span>
-                    <p>Salah satu faktornya adalah kurangnya strategi pemerintah Indonesia</p>
+                    <p>Yang kurang bukan orangnya. Skor strategi pemerintah baru 19/100; gap-nya bukan kapasitas, tapi <em>arah</em>.</p>
                 </div>
                 <div class="story-beat">
                     <span class="beat-number">03</span>
-                    <p>Tanpa strategi, Indonesia akan terus menjadi konsumen teknologi, bukan pengembang</p>
+                    <p>Tanpa strategi AI nasional yang nyata, Indonesia akan terus jadi <em>konsumen</em> teknologi orang lain.</p>
                 </div>
             </div>
         </section>
@@ -319,14 +344,10 @@
         ═══════════════════════════════════════ -->
         <section class="flow-section">
 
-            <h2 class="section-title">Potensi Ekonomi Bersaing,<br>Namun Strategi Nasional Tertinggal</h2>
-            <p class="section-subtitle" style="margin: 8px auto 12px; max-width: 840px; display:block; text-align:center;">
-                Ekonomi Indonesia merupakan terbesar ke-16 di dunia tetapi mengapa skor AInya masih rendah?
+            <h2 class="section-title">Potensi Ekonomi Bersaing, Strategi Nasional Tertinggal</h2>
+            <p class="section-subtitle flow-subtitle" style="margin: 4px auto 8px; display:block; text-align:center;">
+                Indonesia punya ekonomi terbesar ke-16 dunia, tapi ukuran ekonomi tidak otomatis jadi kekuatan AI. India punya GDP lebih kecil, strategi pemerintahnya <strong>2,9&times; lebih tinggi</strong>, dan peringkat AI-nya 27 tingkat di atas kita. Artinya: bukan soal besarnya ekonomi, tapi seberapa serius negara mengarahkan sumber daya ke AI.
             </p>
-
-            <div class="radar-insight" style="margin: 0 auto 16px; max-width: 900px;">
-                <p>India yang memiliki GDP lebih kecil dengan strategi nasional 2,9× lebih tinggi mencapai rank skor AI yang jauh di atas kita (27 peringkat di atas Indonesia). Maka, bukan ekonomi besar yang paling penting, tetapi <strong>strategi pemerintah.</strong></p>
-            </div>
 
             <div class="continent-key" aria-label="Legenda warna benua">
                 <div class="continent-key-item" style="--continent-color:#31f8b9">
@@ -376,20 +397,20 @@
             <!-- SECTION 3: STACKED BAR (PILLARS) -->
             <section class="pillars-section">
 
-                <h2 class="section-title">Strategi Nasional yang Membuat<br><span class="highlight-red">Kita Tertinggal</span></h2>
+                <h2 class="section-title">Strategi Nasional Membuat <span class="highlight-red">Kita Tertinggal</span></h2>
                 <p class="section-narrative narrow">
-                    Skor AI = 6 pilar. Indonesia jatuh di pilar yang paling menentukan: Strategi Pemerintah.
+                    Gap terbesar Indonesia ada di Strategi Pemerintah.
                 </p>
 
                 <!-- Gov Strategy Correlation Callout -->
-                <div style="display:flex; justify-content:center; margin: 4px 0 16px;">
+                <div style="display:flex; justify-content:center; margin: 2px 0 8px;">
                     <div class="gov-strategy-callout">
                         <div>
                             <div class="corr-label">Korelasi</div>
                             <div class="corr-value">r = 0.736</div>
                         </div>
                         <div class="corr-desc">
-                            <strong style="color:rgba(232,234,240,0.90);">Strategi Pemerintah</strong> berkorelasi kuat dengan Skor AI Keseluruhan
+                            <strong style="color:rgba(232,234,240,0.90);">Strategi Pemerintah</strong> paling terkait dengan Skor AI.
                         </div>
                     </div>
                 </div>
@@ -401,37 +422,19 @@
             <!-- SECTION 4: RADAR CHARTS -->
             <section class="radar-section">
 
-                <h2 class="section-title">Talenta AI Masyarakat<br>Indonesia Siap</h2>
+                <h2 class="section-title">Talenta AI Indonesia Siap Berkarya</h2>
 
                 <div class="radar-container">
                     <div class="radar-wrapper radar-idn">
-                        <div class="radar-metaphor" aria-hidden="true">
-                            <svg viewBox="0 0 40 40">
-                                <path d="M12 21a8 8 0 1 1 16 0v7a5 5 0 0 1-5 5h-6a5 5 0 0 1-5-5z" />
-                                <path d="M12 23H8m24 0h-4M15 13l-3-4m13 4 3-4M16 29h8" />
-                                <circle cx="17" cy="20" r="1.7" />
-                                <circle cx="23" cy="20" r="1.7" />
-                            </svg>
-                        </div>
                         <canvas id="radar1" width="400" height="160"></canvas>
                     </div>
                     <div class="radar-wrapper radar-eur">
-                        <div class="radar-metaphor" aria-hidden="true">
-                            <svg viewBox="0 0 40 40">
-                                <circle cx="20" cy="20" r="4" />
-                                <circle cx="10" cy="12" r="3" />
-                                <circle cx="30" cy="12" r="3" />
-                                <circle cx="11" cy="30" r="3" />
-                                <circle cx="30" cy="29" r="3" />
-                                <path d="M13 14l4 4m10-4-4 4m-7 5-4 5m12-5 4 4" />
-                            </svg>
-                        </div>
                         <canvas id="radar2" width="400" height="160"></canvas>
                     </div>
                 </div>
 
                 <div class="radar-insight">
-                    <p>Talenta individu siap. Ekosistem tertinggal.</p>
+                    <p>Survei lintas negara menunjukkan mahasiswa Indonesia relatif percaya diri memakai AI. Individunya siap, ekosistem nasionalnya tertinggal.</p>
                 </div>
             </section>
         </div>
@@ -442,11 +445,13 @@
         <section class="cta-section">
 
             <h2 class="cta-quote">
-                Strategi 19 → 39 = rank #39 → #16. <em>Kapan kita mulai?</em>
+                Setiap kebijakan tanpa strategi AI nasional yang bijaksana =
+                <em>segunung potensi rakyat Indonesia terbuang</em>
+                untuk membayar teknologi bangsa lain.
             </h2>
 
             <p class="cta-sub">
-                Indonesia punya talenta. Punya adopsi. Yang hilang: strategi nasional dan eksekusi.
+                Dengan dukungan kebijakan yang tepat, investasi infrastruktur, dan fokus pada pengembangan talenta, Indonesia dapat memanfaatkan kesadaran AI masyarakat untuk mendukung pertumbuhan ekonomi dan meningkatkan kesejahteraan rakyat. Dengan menaikkan skor strategi dari 19 ke 39, Indonesia bisa maju. India sudah membuktikannya. <strong>Lantas, perlu berapa lama lagi untuk kita maju?</strong>
             </p>
 
             <p class="footer-sources">

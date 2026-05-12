@@ -122,9 +122,9 @@ ideal_radar  = [4.3] * 6
 print("Data ready. N countries:", n)
 
 # ══════════════════════════════════════════
-# 2.  FIGURE + GRIDSPEC (A1 COMPACT)
+# 2.  FIGURE + GRIDSPEC (A2 PORTRAIT)
 # ══════════════════════════════════════════
-fig = plt.figure(figsize=(16, 24), facecolor=BG)
+fig = plt.figure(figsize=(16.54, 23.39), facecolor=BG)
 gs_main = gridspec.GridSpec(
     4, 1,
     height_ratios=[2.2, 12.0, 9.5, 2.8],
