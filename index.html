@@ -3,14 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indonesia Pakai AI, Tapi Belum Siap</title>
+    <title>AI Indonesia Di Mata Dunia</title>
     <link rel="stylesheet" href="style.css">
     <!-- D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+      /* ─── SOFTER CHERRY RED — readable, not blinding ─── */
+      :root {
+        --red: #E8193C;
+        --red-glow-strong: rgba(232, 25, 60, 0.38);
+        --red-glow-mid:    rgba(232, 25, 60, 0.20);
+        --red-glow-soft:   rgba(232, 25, 60, 0.08);
+      }
+
+      /* Soft red — punchy without burning eyes */
+      .highlight-red{
+        color: #ffaeae !important;
+        text-shadow:
+          0 0 6px  rgba(232, 16, 52, 0.5),
+          0 0 18px rgba(255, 0, 0, 0.22);
+      }
+
+      .text-danger {
+        color: #E8193C !important;
+        text-shadow:
+          0 0 6px  rgba(232,25,60,0.50),
+          0 0 18px rgba(232,25,60,0.22);
+      }
+
+      /* ─── SECTION TITLES — BIGGER & PUNCHIER ─── */
+      .section-title {
+        font-size: clamp(2rem, 2.2vw, 3.1rem) !important;
+        font-weight: 900 !important;
+        letter-spacing: -0.03em !important;
+        line-height: 1.0 !important;
+        text-transform: uppercase;
+        position: relative;
+        display: inline-block;
+        white-space: nowrap;
+      }
+
+      /* Accent underline bar — red, contained glow */
+      .section-title::after {
+        content: '';
+        display: block;
+        margin: 12px auto 0;
+        height: 3px;
+        width: 56px;
+        background: #E8193C;
+        box-shadow: 0 0 10px rgba(232,25,60,0.55), 0 0 24px rgba(232,25,60,0.22);
+        border-radius: 2px;
+      }
+
+      /* ─── HOOK TITLE — big, dominant ─── */
+      .hook-title {
+        font-size: clamp(1.9rem, 3.2vw, 2.75rem) !important;
+        font-weight: 900 !important;
+        line-height: 1.08 !important;
+        letter-spacing: -0.03em;
+        white-space: nowrap;
+      }
+      .hook-title .highlight-red {
+        display: inline !important;
+        margin-top: 0;
+      }
+
+      /* ─── HOOK SUBTITLE ─── */
+      .hook-subtitle {
+        font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+        color: rgba(232, 234, 240, 0.62);
+        margin-top: 0;
+        margin-bottom: 0;
+        letter-spacing: 0.01em;
+        font-weight: 400;
+      }
+
+      /* ─── SECTION SUBTITLE ─── */
+      .section-subtitle {
+        font-size: clamp(0.88rem, 1.4vw, 1.05rem);
+        color: rgba(232, 234, 240, 0.58);
+        margin-top: 6px;
+        margin-bottom: 0;
+        letter-spacing: 0.01em;
+      }
+
+      /* ─── GOV STRATEGY HIGHLIGHT (section 3) ─── */
+      .gov-strategy-callout {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 0, 51, 0.10);
+        border: 1px solid rgba(255, 0, 51, 0.45);
+        border-radius: 8px;
+        padding: 10px 18px;
+        margin: 18px 0 0;
+        box-shadow: 0 0 24px rgba(255,0,51,0.14);
+      }
+      .gov-strategy-callout .corr-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.10em;
+        color: rgba(232,234,240,0.55);
+      }
+      .gov-strategy-callout .corr-value {
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #E8193C;
+        text-shadow:
+          0 0 8px rgba(232,25,60,0.50),
+          0 0 20px rgba(232,25,60,0.22);
+        letter-spacing: -0.02em;
+      }
+      .gov-strategy-callout .corr-desc {
+        font-size: 0.82rem;
+        color: rgba(232,234,240,0.70);
+        line-height: 1.4;
+      }
+
+      /* Highlight "Gov. Strategy" bar labels in chart area */
+      .gov-highlight-label {
+        color: #E8193C !important;
+        font-weight: 700 !important;
+        text-shadow: 0 0 6px rgba(232,25,60,0.45);
+      }
+
+      /* ─── CTA SECTION ─── */
+      .cta-quote {
+        font-size: clamp(1.4rem, 3vw, 2.2rem) !important;
+        font-weight: 800 !important;
+        line-height: 1.35 !important;
+        letter-spacing: -0.02em;
+      }
+      .cta-quote em {
+        font-style: normal;
+        color: #ff9898;
+        text-shadow:
+          0 0 6px rgba(232,25,60,0.48),
+          0 0 18px rgba(232,25,60,0.20);
+      }
+      .cta-sub {
+        font-size: clamp(0.88rem, 1.5vw, 1.05rem) !important;
+        color: rgba(232,234,240,0.68) !important;
+        line-height: 1.65;
+        max-width: 1200px;
+        margin: 16px auto 0;
+      }
+
+      /* ─── STAT VALUE — smaller than title, not dominating ─── */
+      .stat-value {
+        font-size: clamp(1.5rem, 2.6vw, 2rem) !important;
+        color: #50F3FF !important;
+        text-shadow:
+          0 0 6px rgba(114, 134, 195, 0.45),
+          0 0 16px rgba(62, 72, 255, 0.18);
+      }
+
+      .text-accent {
+        font-size: clamp(1.5rem, 2.6vw, 2rem) !important;
+        color: #E8193C !important;
+        text-shadow:
+          0 0 6px rgba(232,25,60,0.45),
+          0 0 16px rgba(232,25,60,0.18);
+      }
+
+      /* ─── STAT LABEL — improved readability ─── */
+      .stat-label {
+        font-size: 0.72rem !important;
+        letter-spacing: 0.06em !important;
+        line-height: 1.45 !important;
+        opacity: 0.72;
+      }
+
+      /* ─── NARRATIVE STRIP / STORY BEATS ─── */
+      .beat-number {
+        color: #E8193C !important;
+        text-shadow:
+          0 0 6px rgba(232,25,60,0.45),
+          0 0 14px rgba(232,25,60,0.20);
+        font-weight: 800 !important;
+      }
+
+      /* Gov strategy callout border — softer red */
+      .gov-strategy-callout {
+        border-color: rgba(232, 25, 60, 0.38) !important;
+        background: rgba(232, 25, 60, 0.07) !important;
+        box-shadow: 0 0 18px rgba(232,25,60,0.10) !important;
+      }
+
+      /* Section title underline bar — softer */
+      .section-title::after {
+        background: #E8193C !important;
+        box-shadow: 0 0 8px rgba(232,25,60,0.45), 0 0 18px rgba(232,25,60,0.18) !important;
+      }
+
+      .sections-side-by-side .section-title {
+        font-size: clamp(1.25rem, 1.45vw, 1.7rem) !important;
+        line-height: 1.06 !important;
+        white-space: nowrap;
+      }
+      .sections-side-by-side .section-title::after {
+        margin: 8px auto 0;
+        width: 46px;
+      }
+      .sections-side-by-side .section-narrative {
+        font-size: 0.92rem;
+        line-height: 1.38;
+      }
+      .sections-side-by-side .gov-strategy-callout {
+        margin-top: 4px !important;
+        padding: 9px 14px !important;
+      }
+      .sections-side-by-side .radar-insight p {
+        font-size: 0.84rem;
+      }
+      .cta-section .cta-sub strong {
+        color: rgba(232,234,240,0.92);
+      }
+    </style>
 </head>
 <body>
     <div class="poster-container">
@@ -76,48 +291,64 @@
                 <text x="66" y="61">TECH</text>
             </g>
         </svg>
-        <!-- SECTION 1: HOOK -->
+
+        <!-- ══════════════════════════════════════
+             SECTION 1: HOOK
+        ═══════════════════════════════════════ -->
         <section class="hook-section">
-            <h1 class="hook-title">Indonesia pakai AI lebih banyak dari Jerman,<br><span class="highlight-red">tapi peringkat AI-nya 47 tingkat di bawahnya.</span></h1>
+
+            <h1 class="hook-title">
+                AI Indonesia: <span class="highlight-red">Besar Sebagai Pasar, Kecil Sebagai Pemain</span>
+            </h1>
+            <p class="hook-subtitle">
+                Indonesia pakai AI lebih banyak dari Jerman tapi strategi nasionalnya tertinggal 47 peringkat.
+            </p>
+
             <div class="stats-container">
                 <div class="stat-card">
                     <div class="stat-value text-accent">9/100</div>
-                    <div class="stat-label">AI Score (Rank #39)</div>
+                    <div class="stat-label">Skor AI Nasional · Rank #39 Dunia</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value text-accent">19/100</div>
-                    <div class="stat-label">Gov. Strategy Score</div>
+                    <div class="stat-label">Skor Strategi Pemerintah · 3× lebih rendah dari India</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value text-accent">73%</div>
-                    <div class="stat-label">Internet Penetration</div>
+                    <div class="stat-label">Penetrasi Internet · Fondasi ada, arahnya belum</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value text-accent">9 Juta</div>
-                    <div class="stat-label">Talenta Digital Diharapkan (2030)</div>
+                    <div class="stat-label">Target Talenta Digital 2030 · Tanpa strategi, angka ini kosong</div>
                 </div>
             </div>
+
             <div class="narrative-strip">
                 <div class="story-beat">
                     <span class="beat-number">01</span>
-                    <p>Adopsi AI sudah muncul di keseharian, tapi fondasi nasionalnya belum setebal negara pembanding.</p>
+                    <p>Orang Indonesia sudah pakai AI untuk kerja, belajar, dan bikin konten. Adopsinya nyata, tapi adopsi bukan kesiapan.</p>
                 </div>
                 <div class="story-beat">
                     <span class="beat-number">02</span>
-                    <p>Masalah utama terlihat pada arah strategi: skor pemerintah Indonesia masih pendek di tengah kebutuhan talenta yang besar.</p>
+                    <p>Yang kurang bukan orangnya. Skor strategi pemerintah baru 19/100; gap-nya bukan kapasitas, tapi <em>arah</em>.</p>
                 </div>
                 <div class="story-beat">
                     <span class="beat-number">03</span>
-                    <p>Intinya: penggunaan AI tinggi, tetapi strategi, riset, dan infrastruktur belum mengejar.</p>
+                    <p>Tanpa strategi AI nasional yang nyata, Indonesia akan terus jadi <em>konsumen</em> teknologi orang lain.</p>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION 2: SANKEY + BAR + BUBBLE -->
+        <!-- ══════════════════════════════════════
+             SECTION 2: SANKEY + BAR + BUBBLE
+        ═══════════════════════════════════════ -->
         <section class="flow-section">
-            <div class="radar-insight" style="margin: 0 auto 20px; max-width: 900px;">
-                <p>Indonesia memiliki ekonomi yang sangat besar (GDP total), namun strategi permerintah dalam regulasi AI masih belum sekuat negara berkembang lainnya seperti India atau Brazil, menyebabkan hambatan pada skor AI secara keseluruhan.</p>
-            </div>
+
+            <h2 class="section-title">Potensi Ekonomi Bersaing, Strategi Nasional Tertinggal</h2>
+            <p class="section-subtitle flow-subtitle" style="margin: 4px auto 8px; display:block; text-align:center;">
+                Indonesia punya ekonomi terbesar ke-16 dunia, tapi ukuran ekonomi tidak otomatis jadi kekuatan AI. India punya GDP lebih kecil, strategi pemerintahnya <strong>2,9&times; lebih tinggi</strong>, dan peringkat AI-nya 27 tingkat di atas kita. Artinya: bukan soal besarnya ekonomi, tapi seberapa serius negara mengarahkan sumber daya ke AI.
+            </p>
+
             <div class="continent-key" aria-label="Legenda warna benua">
                 <div class="continent-key-item" style="--continent-color:#31f8b9">
                     <svg class="continent-icon" viewBox="0 0 48 48" aria-hidden="true">
@@ -148,80 +379,84 @@
                     Africa
                 </div>
             </div>
+
             <div class="chart-header">
-                <div class="col-sankey">GDP PER CAPITA (width of band)</div>
-                <div class="col-bar">GOV. STRATEGY SCORE</div>
-                <div class="col-bubble">AI SCORE</div>
+                <div class="col-sankey">GDP PER KAPITA <span style="font-weight:400;opacity:.6;">(lebar pita = skala ekonomi)</span></div>
+                <div class="col-bar gov-highlight-label">SKOR STRATEGI PEMERINTAH ↑</div>
+                <div class="col-bubble">SKOR AI KESELURUHAN</div>
             </div>
             <div class="chart-body" id="flow-charts">
-                <!-- D3 appends SVG here -->
                 <div id="tooltip" class="d3-tooltip"></div>
             </div>
         </section>
 
-        <!-- SECTION 3: STACKED BAR (PILLARS) -->
-        <section class="pillars-section">
-            <h2 class="section-title">AI PILLAR DISTRIBUTION</h2>
-            <p class="section-narrative narrow">Skor AI dibentuk oleh beberapa pilar. Di Indonesia, pilar strategi masih menjadi titik lemah utama.</p>
-            <div class="radar-insight" style="margin: 0 auto 20px; max-width: 900px; padding: 15px 25px;">
-                <p>Dibandingkan negara tetangga seperti Singapura atau bahkan Vietnam, fondasi utama seperti Riset, Pengembangan, dan Infrastruktur Indonesia masih sangat tertinggal, menghambat pemanfaatan AI secara produktif.</p>
-            </div>
-            <div class="legend-container" id="pillar-legend"></div>
-            <div id="pillars-chart">
-                <!-- D3 appends SVG here -->
-            </div>
-        </section>
+        <!-- ══════════════════════════════════════
+             SECTION 3 & 4: SIDE-BY-SIDE LAYOUT
+        ═══════════════════════════════════════ -->
+        <div class="sections-side-by-side">
+            <!-- SECTION 3: STACKED BAR (PILLARS) -->
+            <section class="pillars-section">
 
-        <!-- SECTION 4: RADAR CHARTS -->
-        <section class="radar-section">
-            <h2 class="section-title">KESIAPAN MAHASISWA MENGHADAPI AI: PERBANDINGAN INTERNASIONAL</h2>
-            <div class="radar-container">
-                <div class="radar-wrapper radar-idn">
-                    <div class="radar-metaphor" aria-hidden="true">
-                        <svg viewBox="0 0 40 40">
-                            <path d="M12 21a8 8 0 1 1 16 0v7a5 5 0 0 1-5 5h-6a5 5 0 0 1-5-5z" />
-                            <path d="M12 23H8m24 0h-4M15 13l-3-4m13 4 3-4M16 29h8" />
-                            <circle cx="17" cy="20" r="1.7" />
-                            <circle cx="23" cy="20" r="1.7" />
-                        </svg>
-                    </div>
-                    <canvas id="radar1"></canvas>
-                </div>
-                <div class="radar-wrapper radar-eur">
-                    <div class="radar-metaphor" aria-hidden="true">
-                        <svg viewBox="0 0 40 40">
-                            <circle cx="20" cy="20" r="4" />
-                            <circle cx="10" cy="12" r="3" />
-                            <circle cx="30" cy="12" r="3" />
-                            <circle cx="11" cy="30" r="3" />
-                            <circle cx="30" cy="29" r="3" />
-                            <path d="M13 14l4 4m10-4-4 4m-7 5-4 5m12-5 4 4" />
-                        </svg>
-                    </div>
-                    <canvas id="radar2"></canvas>
-                </div>
-                <div class="radar-wrapper radar-ideal">
-                    <div class="radar-metaphor" aria-hidden="true">
-                        <svg viewBox="0 0 40 40">
-                            <circle cx="20" cy="20" r="14" />
-                            <circle cx="20" cy="20" r="8" />
-                            <circle cx="20" cy="20" r="2.7" />
-                            <path d="M20 4v6M20 30v6M4 20h6M30 20h6" />
-                        </svg>
-                    </div>
-                    <canvas id="radar3"></canvas>
-                </div>
-            </div>
-            <div class="radar-insight">
-                <p>Mahasiswa relatif siap memakai AI. Tantangannya ada pada ekosistem nasional yang belum sama kuat.</p>
-            </div>
-        </section>
+                <h2 class="section-title">Strategi Nasional Membuat <span class="highlight-red">Kita Tertinggal</span></h2>
+                <p class="section-narrative narrow">
+                    Gap terbesar Indonesia ada di Strategi Pemerintah.
+                </p>
 
-        <!-- SECTION 5: CTA -->
+                <!-- Gov Strategy Correlation Callout -->
+                <div style="display:flex; justify-content:center; margin: 2px 0 8px;">
+                    <div class="gov-strategy-callout">
+                        <div>
+                            <div class="corr-label">Korelasi</div>
+                            <div class="corr-value">r = 0.736</div>
+                        </div>
+                        <div class="corr-desc">
+                            <strong style="color:rgba(232,234,240,0.90);">Strategi Pemerintah</strong> paling terkait dengan Skor AI.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="legend-container" id="pillar-legend"></div>
+                <div id="pillars-chart"></div>
+            </section>
+
+            <!-- SECTION 4: RADAR CHARTS -->
+            <section class="radar-section">
+
+                <h2 class="section-title">Talenta AI Indonesia Siap Berkarya</h2>
+
+                <div class="radar-container">
+                    <div class="radar-wrapper radar-idn">
+                        <canvas id="radar1" width="400" height="160"></canvas>
+                    </div>
+                    <div class="radar-wrapper radar-eur">
+                        <canvas id="radar2" width="400" height="160"></canvas>
+                    </div>
+                </div>
+
+                <div class="radar-insight">
+                    <p>Survei lintas negara menunjukkan mahasiswa Indonesia relatif percaya diri memakai AI. Individunya siap, ekosistem nasionalnya tertinggal.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             SECTION 5: CTA
+        ═══════════════════════════════════════ -->
         <section class="cta-section">
-            <h2 class="cta-quote">"Masalahnya bukan uang. Bukan talenta. Bukan internet."</h2>
-            <p class="cta-sub">Gov. Strategy 19 ke 39: proyeksi naik dari rank #39 ke #16 dunia &nbsp;|&nbsp; India (GDP < Indonesia): Gov Strategy 55, rank #12</p>
-            <p class="footer-sources">Tortoise Global AI Index 2024 · UNDP Human Development Report 2023 · World Bank Internet Penetration 2023 · FITPED Cross-National AI Education Survey 2024 (n=1,205)</p>
+
+            <h2 class="cta-quote">
+                Setiap kebijakan tanpa strategi AI nasional yang bijaksana =
+                <em>segunung potensi rakyat Indonesia terbuang</em>
+                untuk membayar teknologi bangsa lain.
+            </h2>
+
+            <p class="cta-sub">
+                Dengan dukungan kebijakan yang tepat, investasi infrastruktur, dan fokus pada pengembangan talenta, Indonesia dapat memanfaatkan kesadaran AI masyarakat untuk mendukung pertumbuhan ekonomi dan meningkatkan kesejahteraan rakyat. Dengan menaikkan skor strategi dari 19 ke 39, Indonesia bisa maju. India sudah membuktikannya. <strong>Lantas, perlu berapa lama lagi untuk kita maju?</strong>
+            </p>
+
+            <p class="footer-sources">
+                Tortoise Global AI Index 2024 · UNDP Human Development Report 2023 · World Bank Internet Penetration 2023 · FITPED Cross-National AI Readiness Survey 2024 (n=1,205)
+            </p>
         </section>
     </div>
 

@@ -122,16 +122,16 @@ ideal_radar  = [4.3] * 6
 print("Data ready. N countries:", n)
 
 # ══════════════════════════════════════════
-# 2.  FIGURE + GRIDSPEC
+# 2.  FIGURE + GRIDSPEC (A2 PORTRAIT)
 # ══════════════════════════════════════════
-fig = plt.figure(figsize=(24, 52), facecolor=BG)
+fig = plt.figure(figsize=(16.54, 23.39), facecolor=BG)
 gs_main = gridspec.GridSpec(
-    5, 1,
-    height_ratios=[2.8, 24.0, 14.0, 14.0, 3.2],
-    hspace=0.03,
+    4, 1,
+    height_ratios=[2.2, 12.0, 9.5, 2.8],
+    hspace=0.04,
     figure=fig,
-    left=0.03, right=0.97,
-    top=0.99, bottom=0.01
+    left=0.04, right=0.96,
+    top=0.98, bottom=0.02
 )
 
 def clean_ax(ax, keep_y=False):
@@ -385,9 +385,15 @@ ax_bub.text(0, Y_MAX - 0.05, 'AI SCORE',
             fontstyle='italic', color=TEXT_DIM, fontweight='bold')
 
 # ══════════════════════════════════════════
-# SECTION 3 — STACKED BAR: AI PILLARS
+# SECTION 3 & 4 — SIDE-BY-SIDE LAYOUT
 # ══════════════════════════════════════════
-ax_s3 = fig.add_subplot(gs_main[2])
+gs34 = gridspec.GridSpecFromSubplotSpec(
+    1, 2, subplot_spec=gs_main[2],
+    width_ratios=[1.3, 1], wspace=0.08
+)
+
+# ── SECTION 3 (LEFT): STACKED BAR ────────────────────────────
+ax_s3 = fig.add_subplot(gs34[0])
 clean_ax(ax_s3)
 
 SUBSET_NAMES = ['United States','China','Singapore','United Kingdom','Germany',
@@ -432,11 +438,11 @@ ax_s3.text(55, n3 + 2.0, 'AI PILLAR DISTRIBUTION',
            fontweight='bold', color=TEXT_DIM, fontstyle='italic')
 
 # ══════════════════════════════════════════
-# SECTION 4 — RADAR × 3 + INSIGHT CARDS
+# SECTION 4 (RIGHT) — RADAR × 2 + INSIGHT CARDS
 # ══════════════════════════════════════════
 gs4 = gridspec.GridSpecFromSubplotSpec(
-    1, 4, subplot_spec=gs_main[3],
-    width_ratios=[3, 3, 3, 2.6], wspace=0.12
+    1, 3, subplot_spec=gs34[1],
+    width_ratios=[2, 2, 1.8], wspace=0.10
 )
 
 def draw_radar(ax, values, color, fill_alpha=0.25, lw=2, ls='-'):
@@ -461,16 +467,15 @@ def draw_radar(ax, values, color, fill_alpha=0.25, lw=2, ls='-'):
 radar_defs = [
     (idn_radar,  '#E24B4A', 'Indonesia',    '-'),
     (adv_radar,  '#378ADD', 'Negara Maju',  '-'),
-    (ideal_radar,'#94A3B8', 'Kondisi Ideal','--'),
 ]
 
 for ci, (vals, color, title, ls) in enumerate(radar_defs):
     ax_r = fig.add_subplot(gs4[ci], projection='polar')
     draw_radar(ax_r, vals, color, ls=ls)
-    ax_r.set_title(title, fontsize=11, fontweight='bold', color=color, pad=16)
+    ax_r.set_title(title, fontsize=10, fontweight='bold', color=color, pad=14)
 
 # Insight cards
-ax_card = fig.add_subplot(gs4[3])
+ax_card = fig.add_subplot(gs4[2])
 clean_ax(ax_card)
 ax_card.set_xlim(0, 1)
 ax_card.set_ylim(0, 1)
@@ -504,7 +509,7 @@ for k, (lbl, val, ok, col) in enumerate(insights):
 # ══════════════════════════════════════════
 # SECTION 5 — CTA + FOOTER
 # ══════════════════════════════════════════
-ax_cta = fig.add_subplot(gs_main[4])
+ax_cta = fig.add_subplot(gs_main[3])
 clean_ax(ax_cta)
 
 ax_cta.text(0.5, 0.88,
