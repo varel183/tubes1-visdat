@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -31,6 +32,21 @@ MAP_PROJECTIONS = {
     "Flat World Map": "natural earth",
     "Mercator Zoom Map": "mercator",
 }
+
+PREDICTOR_FEATURES = [
+    "hdi",
+    "internet_usage_pct",
+    "gdp_per_capita",
+    "ai_talent",
+    "ai_infrastructure",
+    "ai_operating_environment",
+    "ai_research",
+    "ai_development",
+    "ai_government_strategy",
+    "ai_commercial",
+    "ai_scale",
+    "ai_intensity",
+]
 
 PLOTLY_TEMPLATE = "plotly_white"
 
@@ -190,6 +206,26 @@ def build_insights(data: pd.DataFrame, selected_metric_label: str, selected_metr
     return insights
 
 
+@st.cache_data
+def train_regression_model(data: pd.DataFrame, feature_cols: list[str], target_col: str = "ai_overall_score") -> tuple[float, dict[str, float], float, pd.DataFrame]:
+    model_data = data.dropna(subset=feature_cols + [target_col]).copy()
+    if model_data.empty:
+        return 0.0, {feature: 0.0 for feature in feature_cols}, float("nan"), model_data
+
+    X = model_data[feature_cols].astype(float).to_numpy()
+    y = model_data[target_col].astype(float).to_numpy()
+    X_design = np.hstack([np.ones((X.shape[0], 1)), X])
+    coefficients, *_ = np.linalg.lstsq(X_design, y, rcond=None)
+    intercept = float(coefficients[0])
+    weights = {feature: float(coefficients[i + 1]) for i, feature in enumerate(feature_cols)}
+    predictions = X_design.dot(coefficients)
+    ss_res = np.sum((y - predictions) ** 2)
+    ss_tot = np.sum((y - y.mean()) ** 2)
+    r2 = 1 - ss_res / ss_tot if ss_tot > 0 else float("nan")
+    model_data["predicted_ai_overall_score"] = predictions
+    return intercept, weights, float(r2), model_data
+
+
 df = load_ai_data()
 gdp_ts = load_world_bank_timeseries(GDP_DATA, "gdp_per_capita")
 internet_ts = load_world_bank_timeseries(INTERNET_DATA, "internet_usage_pct")
@@ -258,7 +294,7 @@ kpi_cols[2].metric("Average AI Score", f"{average_ai:.1f}")
 kpi_cols[3].metric("Average HDI", f"{average_hdi:.3f}")
 kpi_cols[4].metric("Median GDP/capita", format_number(median_gdp))
 
-tabs = st.tabs(["Overview", "Quadrant", "Compare", "Trends", "Data"])
+tabs = st.tabs(["Overview", "Quadrant", "Compare", "Trends", "Simulator", "Data"])
 
 with tabs[0]:
     insight_cols = st.columns(4)
@@ -542,6 +578,116 @@ with tabs[3]:
         st.plotly_chart(latest_fig, width="stretch")
 
 with tabs[4]:
+    st.subheader("AI Prediction Simulator")
+    st.write(
+        "Pilih fitur yang ingin dimasukkan ke model, lalu geser nilai fitur untuk melihat bagaimana prediksi AI score berubah. "
+        "Semakin besar koefisien positif, semakin besar dampak kenaikan nilai fitur terhadap AI score."
+    )
+
+    predict_country = st.selectbox(
+        "Country to simulate",
+        country_options,
+        index=country_options.index("Indonesia") if "Indonesia" in country_options else 0,
+    )
+
+    selected_predictors = st.multiselect(
+        "Choose predictor features",
+        options=PREDICTOR_FEATURES,
+        default=["hdi", "internet_usage_pct", "gdp_per_capita"],
+        format_func=lambda x: x.replace("_", " ").title(),
+    )
+
+    if not selected_predictors:
+        st.warning("Pilih minimal satu fitur prediksi.")
+    else:
+        intercept, weights, r2, model_data = train_regression_model(filtered, selected_predictors)
+        st.markdown(f"**Linear regression model**  \nR²: {r2:.3f}")
+
+        coef_df = pd.DataFrame(
+            {
+                "feature": ["intercept"] + selected_predictors,
+                "coefficient": [intercept] + [weights[feature] for feature in selected_predictors],
+            }
+        )
+        coef_df["feature"] = coef_df["feature"].str.replace("_", " ").str.title()
+        st.dataframe(coef_df, hide_index=True, width="stretch")
+
+        coef_rank = sorted(weights.items(), key=lambda x: x[1], reverse=True)
+        if coef_rank:
+            top_positive = [f"{feature.replace('_', ' ').title()} ({value:.3f})" for feature, value in coef_rank if value > 0][:3]
+            top_negative = [f"{feature.replace('_', ' ').title()} ({value:.3f})" for feature, value in coef_rank if value < 0][:2]
+
+            recommendation_lines = []
+            if top_positive:
+                recommendation_lines.append(
+                    f"Fitur paling berpengaruh naikkan AI score: {', '.join(top_positive)}."
+                )
+            if top_negative:
+                recommendation_lines.append(
+                    f"Fitur dengan dampak negatif jika naik: {', '.join(top_negative)}."
+                )
+            if recommendation_lines:
+                st.markdown("**Rekomendasi fitur:**")
+                for line in recommendation_lines:
+                    st.markdown(f"- {line}")
+
+        country_row = df[df["country"] == predict_country].iloc[0]
+        feature_settings = {}
+
+        slider_col_left, slider_col_right = st.columns(2)
+        for idx, feature in enumerate(selected_predictors):
+            col = slider_col_left if idx % 2 == 0 else slider_col_right
+            feature_min = float(df[feature].min())
+            feature_max = float(df[feature].max())
+            default_value = float(country_row[feature]) if pd.notna(country_row[feature]) else float((feature_min + feature_max) / 2)
+            step = float(max((feature_max - feature_min) / 100, 0.1))
+            feature_settings[feature] = col.slider(
+                feature.replace("_", " ").title(),
+                min_value=feature_min,
+                max_value=feature_max,
+                value=default_value,
+                step=step,
+            )
+
+        feature_vector = np.array([feature_settings[feature] for feature in selected_predictors], dtype=float)
+        predicted_score = intercept + feature_vector.dot(np.array([weights[feature] for feature in selected_predictors], dtype=float))
+        actual_score = float(country_row["ai_overall_score"]) if pd.notna(country_row["ai_overall_score"]) else float("nan")
+
+        delta_text = None
+        if pd.notna(actual_score):
+            delta_text = f"{predicted_score - actual_score:+.1f}"
+
+        st.metric("Predicted AI Score", f"{predicted_score:.1f}", delta=delta_text)
+        if pd.notna(actual_score):
+            st.caption(f"Actual AI Score for {predict_country}: {actual_score:.1f}")
+
+        if not model_data.empty:
+            scatter_fig = px.scatter(
+                model_data,
+                x="ai_overall_score",
+                y="predicted_ai_overall_score",
+                hover_name="country",
+                title="Actual vs Predicted AI Score",
+                labels={
+                    "ai_overall_score": "Actual AI Score",
+                    "predicted_ai_overall_score": "Predicted AI Score",
+                },
+                template=PLOTLY_TEMPLATE,
+            )
+            min_val = min(model_data["ai_overall_score"].min(), model_data["predicted_ai_overall_score"].min())
+            max_val = max(model_data["ai_overall_score"].max(), model_data["predicted_ai_overall_score"].max())
+            scatter_fig.add_shape(
+                type="line",
+                x0=min_val,
+                y0=min_val,
+                x1=max_val,
+                y1=max_val,
+                line=dict(dash="dash", color="#667085"),
+            )
+            scatter_fig.update_layout(height=520, margin=dict(l=0, r=0, t=55, b=0))
+            st.plotly_chart(scatter_fig, width="stretch")
+
+with tabs[5]:
     display_cols = [
         "country",
         "ai_overall_score",
