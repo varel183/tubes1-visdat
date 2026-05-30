@@ -205,12 +205,14 @@ st.markdown(
         }
         div[data-testid="stMetricLabel"] p {
             font-size: 0.82rem;
-            color: #475467;
+            color: #101828 important!;
             line-height: 1.25;
         }
+    
         div[data-testid="stMetricValue"] {
             font-size: 1.45rem;
             line-height: 1.2;
+            color: #101828;
         }
         div[data-testid="stMetricDelta"] {
             line-height: 1.25;
@@ -1373,8 +1375,11 @@ with tabs[2]:
     with compare_bar_col:
         st.plotly_chart(compare_bar_fig, width="stretch")
 
-    profile_cards = st.columns(min(len(compare_df), 4))
-    for idx, (_, row) in enumerate(compare_df.head(4).iterrows()):
+    compare_df = compare_df.sort_values("rank_ai_overall")
+    visible_profiles = compare_df.head(4)
+    profile_cards = st.columns(len(visible_profiles))
+
+    for idx, (_, row) in enumerate(visible_profiles.iterrows()):
         strongest, weakest = country_strengths(row)
         with profile_cards[idx]:
             st.markdown(
@@ -1394,6 +1399,46 @@ with tabs[2]:
                 """,
                 unsafe_allow_html=True,
             )
+
+    if len(compare_df) > 4:
+        with st.expander(
+            f"Show {len(compare_df)-4} more countries"
+        ):
+            remaining_profiles = compare_df.iloc[4:]
+            cards_per_row = 4
+            for start_idx in range(0, len(remaining_profiles), cards_per_row):
+                cols = st.columns(cards_per_row)
+                row_data = remaining_profiles.iloc[
+                    start_idx:start_idx + cards_per_row
+                ]
+                for col, (_, row) in zip(cols, row_data.iterrows()):
+                    strongest, weakest = country_strengths(row)
+                    with col:
+                        st.markdown(
+                            f"""
+                            <div class="profile-card">
+                                <div>
+                                    <div class="profile-card-title">{row["country"]}</div>
+                                    <div class="profile-card-score">{row["ai_overall_score"]:.1f}</div>
+                                    <div class="profile-card-rank">
+                                        AI rank {row["rank_ai_overall"]:.0f}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="profile-card-detail">
+                                        <b>Strongest:</b> {strongest}
+                                    </div>
+                                    <div class="profile-card-detail">
+                                        <b>Weakest:</b> {weakest}
+                                    </div>
+                                    <div class="profile-card-detail">
+                                        <b>GDP/capita:</b> {row["gdp_display"]}
+                                    </div>
+                                </div>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
 
 with tabs[3]:
     trend_countries = [country for country in selected_countries if country in country_options]
