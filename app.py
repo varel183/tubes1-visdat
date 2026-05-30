@@ -11,6 +11,9 @@ BASE_DIR = Path(__file__).parent
 MAIN_DATA = BASE_DIR / "ai_data.csv"
 GDP_DATA = BASE_DIR / "dataset" / "gdp_per_capita.csv"
 INTERNET_DATA = BASE_DIR / "dataset" / "internet_usage.csv"
+AI_PUBLICATIONS_DATA = BASE_DIR / "dataset" / "ai_publications_owid.csv"
+AI_PATENTS_DATA = BASE_DIR / "dataset" / "ai_patents_per_million_owid.csv"
+AI_INVESTMENT_DATA = BASE_DIR / "dataset" / "ai_private_investment_owid.csv"
 
 AI_METRICS = {
     "Overall AI Score": "ai_overall_score",
@@ -34,10 +37,10 @@ MAP_PROJECTIONS = {
 }
 
 QUADRANT_COLORS = {
-    "Higher GDP · Higher AI": "#1D9E75",
-    "Lower GDP · Higher AI": "#378ADD",
-    "Higher GDP · Lower AI": "#EF9F27",
-    "Lower GDP · Lower AI": "#D4537E",
+    "Higher GDP - Higher AI": "#1D9E75",
+    "Lower GDP - Higher AI": "#378ADD",
+    "Higher GDP - Lower AI": "#EF9F27",
+    "Lower GDP - Lower AI": "#D4537E",
 }
 
 PREDICTOR_FEATURES = [
@@ -55,7 +58,126 @@ PREDICTOR_FEATURES = [
     "ai_intensity",
 ]
 
+TREND_SOURCES = {
+    "AI Publications": {
+        "path": AI_PUBLICATIONS_DATA,
+        "value_col": "ai_publications",
+        "label": "AI scholarly publications",
+        "source_note": "OWID/CSET, annual scholarly publications related to AI.",
+        "format": "count",
+    },
+    "AI Patents per Million": {
+        "path": AI_PATENTS_DATA,
+        "value_col": "ai_patents_per_million",
+        "label": "AI patent applications per million people",
+        "source_note": "OWID/CSET, AI-related patent applications per million people.",
+        "format": "decimal",
+    },
+    "Private AI Investment": {
+        "path": AI_INVESTMENT_DATA,
+        "value_col": "ai_private_investment",
+        "label": "Private AI investment, constant 2021 US$",
+        "source_note": "OWID/CSET, estimated funding raised by privately held AI companies.",
+        "format": "money",
+    },
+    "GDP per Capita": {
+        "value_col": "gdp_per_capita",
+        "label": "GDP per capita",
+        "source_note": "World Bank WDI, supporting economic context.",
+        "format": "money",
+    },
+    "Internet Usage": {
+        "value_col": "internet_usage_pct",
+        "label": "Internet usage (%)",
+        "source_note": "World Bank WDI, supporting digital access context.",
+        "format": "percent",
+    },
+}
+
 PLOTLY_TEMPLATE = "plotly_white"
+
+COUNTRY_ISO3 = {
+    "Algeria": "DZA",
+    "Argentina": "ARG",
+    "Armenia": "ARM",
+    "Australia": "AUS",
+    "Austria": "AUT",
+    "Azerbaijan": "AZE",
+    "Bahrain": "BHR",
+    "Bangladesh": "BGD",
+    "Belgium": "BEL",
+    "Benin": "BEN",
+    "Brazil": "BRA",
+    "Bulgaria": "BGR",
+    "Canada": "CAN",
+    "Chile": "CHL",
+    "China": "CHN",
+    "Colombia": "COL",
+    "Croatia": "HRV",
+    "Czech Republic": "CZE",
+    "Denmark": "DNK",
+    "Egypt": "EGY",
+    "Estonia": "EST",
+    "Ethiopia": "ETH",
+    "Finland": "FIN",
+    "France": "FRA",
+    "Germany": "DEU",
+    "Ghana": "GHA",
+    "Greece": "GRC",
+    "Hungary": "HUN",
+    "Iceland": "ISL",
+    "India": "IND",
+    "Indonesia": "IDN",
+    "Iran": "IRN",
+    "Iraq": "IRQ",
+    "Ireland": "IRL",
+    "Israel": "ISR",
+    "Italy": "ITA",
+    "Japan": "JPN",
+    "Jordan": "JOR",
+    "Kenya": "KEN",
+    "Latvia": "LVA",
+    "Lithuania": "LTU",
+    "Luxembourg": "LUX",
+    "Malaysia": "MYS",
+    "Malta": "MLT",
+    "Mauritius": "MUS",
+    "Mexico": "MEX",
+    "Morocco": "MAR",
+    "New Zealand": "NZL",
+    "Nigeria": "NGA",
+    "Norway": "NOR",
+    "Oman": "OMN",
+    "Pakistan": "PAK",
+    "Peru": "PER",
+    "Philippines": "PHL",
+    "Poland": "POL",
+    "Portugal": "PRT",
+    "Qatar": "QAT",
+    "Romania": "ROU",
+    "Russia": "RUS",
+    "Rwanda": "RWA",
+    "Saudi Arabia": "SAU",
+    "Serbia": "SRB",
+    "Singapore": "SGP",
+    "Slovakia": "SVK",
+    "Slovenia": "SVN",
+    "South Africa": "ZAF",
+    "South Korea": "KOR",
+    "Spain": "ESP",
+    "Sri Lanka": "LKA",
+    "Sweden": "SWE",
+    "Switzerland": "CHE",
+    "Thailand": "THA",
+    "Tunisia": "TUN",
+    "Turkey": "TUR",
+    "Ukraine": "UKR",
+    "United Arab Emirates": "ARE",
+    "United Kingdom": "GBR",
+    "United States": "USA",
+    "Uruguay": "URY",
+    "Vietnam": "VNM",
+}
 
 
 st.set_page_config(
@@ -73,16 +195,98 @@ st.markdown(
         div[data-testid="stMetric"] {
             border: 1px solid #e4e7ec;
             border-radius: 8px;
+            min-height: 112px;
             padding: 14px 16px;
             background: #ffffff;
             box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         div[data-testid="stMetricLabel"] p {
             font-size: 0.82rem;
             color: #475467;
+            line-height: 1.25;
         }
         div[data-testid="stMetricValue"] {
             font-size: 1.45rem;
+            line-height: 1.2;
+        }
+        div[data-testid="stMetricDelta"] {
+            line-height: 1.25;
+        }
+        div[data-testid="stAlert"] {
+            min-height: 108px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+        div[data-testid="stAlert"] > div {
+            width: 100%;
+        }
+        .profile-card {
+            min-height: 150px;
+            border: 1px solid #e4e7ec;
+            border-radius: 8px;
+            padding: 14px 16px;
+            background: #ffffff;
+            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .profile-card-title {
+            color: #101828;
+            font-size: 0.92rem;
+            font-weight: 700;
+            line-height: 1.25;
+            margin-bottom: 2px;
+        }
+        .profile-card-score {
+            color: #101828;
+            font-size: 1.55rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        .profile-card-rank {
+            color: #475467;
+            font-size: 0.78rem;
+            line-height: 1.25;
+        }
+        .profile-card-detail {
+            color: #475467;
+            font-size: 0.78rem;
+            line-height: 1.35;
+            margin-top: 2px;
+        }
+        .insight-card {
+            min-height: 148px;
+            border-radius: 8px;
+            padding: 16px 18px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .insight-card-label {
+            font-size: 0.70rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 4px;
+            opacity: 0.75;
+        }
+        .insight-card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1.25;
+        }
+        .insight-card-body {
+            font-size: 0.82rem;
+            line-height: 1.55;
+            opacity: 0.9;
         }
     </style>
     """,
@@ -93,6 +297,7 @@ st.markdown(
 @st.cache_data
 def load_ai_data() -> pd.DataFrame:
     df = pd.read_csv(MAIN_DATA)
+    df["iso_alpha"] = df["country"].map(COUNTRY_ISO3)
     numeric_cols = [
         "ai_overall_score",
         "ai_talent",
@@ -235,7 +440,7 @@ def load_ai_data() -> pd.DataFrame:
             "Benin": "Sub-Saharan Africa",
             "Botswana": "Sub-Saharan Africa",
             "Cameroon": "Sub-Saharan Africa",
-            "Côte d'Ivoire": "Sub-Saharan Africa",
+            "Cote d'Ivoire": "Sub-Saharan Africa",
             "Ethiopia": "Sub-Saharan Africa",
             "Ghana": "Sub-Saharan Africa",
             "Kenya": "Sub-Saharan Africa",
@@ -274,6 +479,31 @@ def load_world_bank_timeseries(path: Path, value_name: str) -> pd.DataFrame:
     return long.dropna(subset=["year", value_name])
 
 
+@st.cache_data
+def load_owid_timeseries(path: Path, value_name: str) -> pd.DataFrame:
+    if not path.exists():
+        return pd.DataFrame(columns=["country", "country_code", "year", value_name])
+
+    raw = pd.read_csv(path)
+    value_candidates = [col for col in raw.columns if col not in {"Entity", "Code", "Year"}]
+    if not value_candidates:
+        return pd.DataFrame(columns=["country", "country_code", "year", value_name])
+
+    value_source = value_candidates[0]
+    data = raw.rename(
+        columns={
+            "Entity": "country",
+            "Code": "country_code",
+            "Year": "year",
+            value_source: value_name,
+        }
+    )
+    data["year"] = pd.to_numeric(data["year"], errors="coerce")
+    data[value_name] = pd.to_numeric(data[value_name], errors="coerce")
+    data = data.dropna(subset=["country", "year", value_name])
+    return data[["country", "country_code", "year", value_name]]
+
+
 def format_number(value: float, suffix: str = "") -> str:
     if pd.isna(value):
         return "-"
@@ -282,6 +512,61 @@ def format_number(value: float, suffix: str = "") -> str:
     if abs(value) >= 1_000:
         return f"{value / 1_000:.1f}K{suffix}"
     return f"{value:.1f}{suffix}"
+
+
+def format_trend_value(value: float, value_format: str) -> str:
+    if pd.isna(value):
+        return "-"
+    if value_format == "money":
+        return f"${format_number(value)}"
+    if value_format == "percent":
+        return f"{value:.1f}%"
+    if value_format == "decimal":
+        return f"{value:.3f}"
+    return format_number(value)
+
+
+def add_growth_metrics(data: pd.DataFrame, value_col: str) -> pd.DataFrame:
+    if data.empty:
+        return data
+
+    rows = []
+    for country, group in data.sort_values("year").groupby("country"):
+        latest = group.iloc[-1]
+        baseline_pool = group[group["year"] <= latest["year"] - 5]
+        baseline = baseline_pool.iloc[-1] if not baseline_pool.empty else group.iloc[0]
+        baseline_value = float(baseline[value_col])
+        latest_value = float(latest[value_col])
+        abs_growth = latest_value - baseline_value
+        pct_growth = np.nan
+        if baseline_value > 0:
+            pct_growth = abs_growth / baseline_value * 100
+        rows.append(
+            {
+                "country": country,
+                "latest_year": int(latest["year"]),
+                "latest_value": latest_value,
+                "baseline_year": int(baseline["year"]),
+                "baseline_value": baseline_value,
+                "absolute_growth": abs_growth,
+                "pct_growth": pct_growth,
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def latest_values_for_countries(data: pd.DataFrame, value_col: str, countries: list[str]) -> pd.DataFrame:
+    if data.empty:
+        return pd.DataFrame(columns=["country", "latest_year", value_col])
+
+    latest = (
+        data[data["country"].isin(countries)]
+        .dropna(subset=[value_col])
+        .sort_values("year")
+        .groupby("country", as_index=False)
+        .tail(1)
+    )
+    return latest.rename(columns={"year": "latest_year"})[["country", "latest_year", value_col]]
 
 
 def metric_hover_data(selected_metric: str) -> dict[str, str | bool]:
@@ -313,14 +598,14 @@ def build_insights(data: pd.DataFrame, selected_metric_label: str, selected_metr
     overperformer = data.nlargest(1, "readiness_gap").iloc[0]
 
     insights = [
-        f"{top_ai['country']} memimpin AI overall score dengan nilai {top_ai['ai_overall_score']:.1f}.",
-        f"{top_metric['country']} paling kuat pada indikator {selected_metric_label} dengan nilai {top_metric[selected_metric]:.1f}.",
-        f"{overperformer['country']} terlihat paling overperform dibanding fondasi HDI, internet, dan GDP relatifnya.",
+        f"{top_ai['country']} leads the AI overall score with a value of {top_ai['ai_overall_score']:.1f}.",
+        f"{top_metric['country']} is strongest on {selected_metric_label}, with a score of {top_metric[selected_metric]:.1f}.",
+        f"{overperformer['country']} appears to overperform relative to its HDI, internet access, and GDP foundation.",
     ]
     if not high_foundation_low_ai.empty:
         candidate = high_foundation_low_ai.iloc[0]
         insights.append(
-            f"{candidate['country']} punya fondasi digital relatif tinggi, tetapi AI score-nya masih di bawah median data."
+            f"{candidate['country']} has a relatively strong digital foundation, but its AI score is still below the dataset median."
         )
     return insights
 
@@ -351,7 +636,7 @@ def compute_radial_layout(
     similarities_to_ref: np.ndarray,
 ) -> np.ndarray:
     """Radial layout: ref at center, peers on rings scaled by similarity.
-    Higher similarity → closer to center. Peers evenly spaced by angle."""
+    Higher similarity means closer to center. Peers are evenly spaced by angle."""
     pos = np.zeros((n_nodes, 2))
     peer_indices = [i for i in range(n_nodes) if i != ref_local_idx]
     n_peers = len(peer_indices)
@@ -367,7 +652,7 @@ def compute_radial_layout(
  
     for rank, i in enumerate(peer_by_sim):
         angle = 2 * np.pi * rank / n_peers
-        # Most similar → radius 1.2, least similar → radius 3.5
+        # Most similar maps to radius 1.2, least similar maps to radius 3.5.
         norm = (similarities_to_ref[i] - s_min) / s_range   # 0 = least, 1 = most similar
         radius = 3.5 - norm * 2.3
         pos[i] = [radius * np.cos(angle), radius * np.sin(angle)]
@@ -378,6 +663,9 @@ def compute_radial_layout(
 df = load_ai_data()
 gdp_ts = load_world_bank_timeseries(GDP_DATA, "gdp_per_capita")
 internet_ts = load_world_bank_timeseries(INTERNET_DATA, "internet_usage_pct")
+ai_publications_ts = load_owid_timeseries(AI_PUBLICATIONS_DATA, "ai_publications")
+ai_patents_ts = load_owid_timeseries(AI_PATENTS_DATA, "ai_patents_per_million")
+ai_investment_ts = load_owid_timeseries(AI_INVESTMENT_DATA, "ai_private_investment")
 country_options = sorted(df["country"].dropna().unique())
 
 default_compare = [
@@ -421,7 +709,7 @@ filtered = df[
 ].copy()
 
 if filtered.empty:
-    st.warning("Tidak ada data yang sesuai dengan filter.")
+    st.warning("No data matches the current filters.")
     st.stop()
 
 top_country = filtered.sort_values("ai_overall_score", ascending=False).iloc[0]
@@ -432,8 +720,8 @@ median_gdp = filtered["gdp_per_capita"].median()
 
 st.title("Global AI Readiness Dashboard")
 st.caption(
-    "Dashboard interaktif untuk membaca kesiapan AI global melalui indeks AI, kualitas manusia, "
-    "akses internet, dan kondisi ekonomi."
+    "An interactive dashboard for exploring global AI readiness through AI index scores, "
+    "human development, internet access, and economic conditions."
 )
 
 kpi_cols = st.columns(5)
@@ -452,8 +740,7 @@ with tabs[0]:
 
     map_fig = px.choropleth(
         filtered,
-        locations="country",
-        locationmode="country names",
+        locations="iso_alpha",
         color=selected_metric,
         hover_name="country",
         hover_data=metric_hover_data(selected_metric),
@@ -606,7 +893,7 @@ with tabs[0]:
 
 with tabs[1]:
  
-    # ── Region filter (only shown when data has a region column) ─────────────
+    # Region filter, only shown when data has a region column.
     has_region = "region" in filtered.columns and filtered["region"].notna().any()
     if has_region:
         all_regions = sorted(filtered["region"].dropna().unique())
@@ -628,28 +915,28 @@ with tabs[1]:
         st.info("No countries match the current region filter.")
         st.stop()
  
-    # ── Quadrant data prep ────────────────────────────────────────────────────
+    # Quadrant data prep.
     quadrant_data = explore_data.dropna(subset=["gdp_per_capita", "ai_overall_score"]).copy()
     quadrant_data = quadrant_data[quadrant_data["gdp_per_capita"] > 0]
     gdp_med = quadrant_data["gdp_per_capita"].median()
     ai_med = quadrant_data["ai_overall_score"].median()
  
-    quadrant_data["quadrant"] = "Lower GDP · Lower AI"
+    quadrant_data["quadrant"] = "Lower GDP - Lower AI"
     quadrant_data.loc[
         (quadrant_data["gdp_per_capita"] >= gdp_med) & (quadrant_data["ai_overall_score"] >= ai_med),
         "quadrant",
-    ] = "Higher GDP · Higher AI"
+    ] = "Higher GDP - Higher AI"
     quadrant_data.loc[
         (quadrant_data["gdp_per_capita"] < gdp_med) & (quadrant_data["ai_overall_score"] >= ai_med),
         "quadrant",
-    ] = "Lower GDP · Higher AI"
+    ] = "Lower GDP - Higher AI"
     quadrant_data.loc[
         (quadrant_data["gdp_per_capita"] >= gdp_med) & (quadrant_data["ai_overall_score"] < ai_med),
         "quadrant",
-    ] = "Higher GDP · Lower AI"
+    ] = "Higher GDP - Lower AI"
  
-    # ── Similarity network data prep ──────────────────────────────────────────
-    # Use ALL explore_data countries — fill NaN with median rather than dropping rows.
+    # Similarity network data prep.
+    # Use all explore_data countries, filling NaN with medians rather than dropping rows.
     # dropna on 11 columns kills most countries (any single missing value removes the row).
     sim_feature_cols = list(AI_DIMENSIONS.values()) + ["hdi", "internet_usage_pct"]
     sim_data = explore_data.copy().reset_index(drop=True)
@@ -670,13 +957,13 @@ with tabs[1]:
     countries_arr = sim_data["country"].tolist()
     n_c = len(countries_arr)
  
-    # Pairwise euclidean distance → similarity
+    # Pairwise Euclidean distance to similarity.
     diffs = norm_vals[:, np.newaxis, :] - norm_vals[np.newaxis, :, :]   # (n, n, feats)
     dist_mat_full = np.sqrt((diffs ** 2).sum(axis=2))                    # (n, n)
     max_d = dist_mat_full.max() + 1e-8
     sim_mat = 1.0 - dist_mat_full / max_d                                # (n, n)
  
-    # ── TOP ROW ───────────────────────────────────────────────────────────────
+    # Top row.
     top_left, top_right = st.columns([3, 2])
  
     with top_left:
@@ -710,7 +997,7 @@ with tabs[1]:
             legend=dict(orientation="h", yanchor="top", y=-0.24, xanchor="left", x=0.15),
             margin=dict(l=0, r=0, t=30, b=0),
         )
-        st.plotly_chart(quadrant_fig, use_container_width=True)
+        st.plotly_chart(quadrant_fig, width="stretch")
  
     with top_right:
         ref_options = sorted(explore_data["country"].dropna().unique())
@@ -757,7 +1044,7 @@ with tabs[1]:
  
         country_to_quad = dict(zip(quadrant_data["country"], quadrant_data["quadrant"]))
  
-        # ── Build node data lists (single pass, 3 traces total) ───────────────
+        # Build node data lists in a single pass.
         peer_x, peer_y, peer_text, peer_color, peer_size = [], [], [], [], []
         peer_hover, peer_customdata = [], []
  
@@ -765,7 +1052,7 @@ with tabs[1]:
  
         for i, c in enumerate(display_countries):
             is_ref = (c == ref_country)
-            quad = country_to_quad.get(c, "Lower GDP · Lower AI")
+            quad = country_to_quad.get(c, "Lower GDP - Lower AI")
             node_color = QUADRANT_COLORS.get(quad, "#888780")
             row_s = sim_data[sim_data["country"] == c]
             ai_score = float(row_s.iloc[0]["ai_overall_score"]) if (not row_s.empty and pd.notna(row_s.iloc[0]["ai_overall_score"])) else 10.0
@@ -786,8 +1073,8 @@ with tabs[1]:
  
         force_fig = go.Figure()
  
-        # ── Edges: bucket by strength so thickness + opacity encodes similarity ──
-        # All edge weights in a narrow absolute range (e.g. 0.91–0.93), so we
+        # Bucket edges by strength so thickness and opacity encode similarity.
+        # Edge weights are often in a narrow absolute range, so we
         # normalise WITHIN the subgraph to stretch that range into visible contrast.
         if edge_tuples:
             ew_vals = np.array([ew for _, _, ew in edge_tuples])
@@ -850,7 +1137,7 @@ with tabs[1]:
                 size=26,
                 color="#2C2C2A",
                 line=dict(width=3, color=QUADRANT_COLORS.get(
-                    country_to_quad.get(ref_country, "Lower GDP · Lower AI"), "#888780"
+                    country_to_quad.get(ref_country, "Lower GDP - Lower AI"), "#888780"
                 )),
             ),
             text=[ref_country],
@@ -861,7 +1148,7 @@ with tabs[1]:
         ))
  
         force_fig.update_layout(
-            #title=f"Structural peers of {ref_country}  ·  node size = AI score  ·  line weight = similarity strength",
+            #title=f"Structural peers of {ref_country}; node size = AI score; line weight = similarity strength",
             height=460,
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, showline=False),
             yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, showline=False),
@@ -874,14 +1161,14 @@ with tabs[1]:
             template=PLOTLY_TEMPLATE,
             plot_bgcolor="#f8fafc",
         )
-        st.plotly_chart(force_fig, use_container_width=True)
+        st.plotly_chart(force_fig, width="stretch")
  
-    # ── BOTTOM ROW ────────────────────────────────────────────────────────────
+    # Bottom row.
     bot_left, bot_right = st.columns(2)
  
     with bot_left:
-        # Dumbbell chart: foundation score (gray) → actual AI score (teal)
-        # Sorted by how far AI exceeds foundation — makes the "punching above weight" story clear
+        # Dumbbell chart: foundation score (gray) to actual AI score (teal).
+        # Sorted by how far AI exceeds foundation.
         over = explore_data.nlargest(10, "readiness_gap").sort_values("readiness_gap")
  
         over_fig = go.Figure()
@@ -918,17 +1205,17 @@ with tabs[1]:
             #title="Overperformer Countries",
             #subtitle="Lowest gap of development foundation to AI score",
             height=380,
-            xaxis_title="Score (0–100)",
+            xaxis_title="Score (0-100)",
             yaxis_title="",
             legend=dict(orientation="h", yanchor="bottom", y=0.98, xanchor="left", x=0.1),
             margin=dict(l=0, r=0, t=0, b=0),
             template=PLOTLY_TEMPLATE,
         )
-        st.plotly_chart(over_fig, use_container_width=True)
+        st.plotly_chart(over_fig, width="stretch")
  
     with bot_right:
         # Dumbbell chart mirroring overperformers but reversed: foundation (blue) > AI (red)
-        # Each country on its own row — no label stacking, no ambiguous slopes
+        # Each country on its own row to avoid label stacking and ambiguous slopes.
         under = explore_data.nsmallest(10, "readiness_gap").sort_values("readiness_gap", ascending=False)
  
         under_fig = go.Figure()
@@ -965,15 +1252,15 @@ with tabs[1]:
         under_fig.update_layout(
             #title="Untapped Potential",
             height=380,
-            xaxis_title="Score (0–100)",
+            xaxis_title="Score (0-100)",
             yaxis_title="",
             legend=dict(orientation="h", yanchor="bottom", y=0.98, xanchor="left", x=0.1),
             margin=dict(l=0, r=0, t=0, b=0),
             template=PLOTLY_TEMPLATE,
         )
-        st.plotly_chart(under_fig, use_container_width=True)
+        st.plotly_chart(under_fig, width="stretch")
  
-    # ── INSIGHT CARDS (full-width, 3 columns below the charts) ────────────────
+    # Insight cards below the charts.
     top_over = explore_data.nlargest(1, "readiness_gap").iloc[0]
     top_under = explore_data.nsmallest(1, "readiness_gap").iloc[0]
  
@@ -1016,13 +1303,12 @@ with tabs[1]:
     card_cols = st.columns(3)
     for col, (bg, tc, label, title, body) in zip(card_cols, cards):
         col.markdown(
-            f"""<div style="background:{bg};border-radius:10px;padding:16px 18px;height:100%;">
-                <div style="font-size:0.70rem;font-weight:600;text-transform:uppercase;
-                            letter-spacing:0.07em;color:{tc};margin-bottom:4px;opacity:0.75;">
+            f"""<div class="insight-card" style="background:{bg};color:{tc};">
+                <div class="insight-card-label" style="color:{tc};">
                     {label}</div>
-                <div style="font-size:1.05rem;font-weight:600;color:{tc};margin-bottom:6px;">
+                <div class="insight-card-title" style="color:{tc};">
                     {title}</div>
-                <div style="font-size:0.82rem;color:{tc};line-height:1.6;opacity:0.9;">
+                <div class="insight-card-body" style="color:{tc};">
                     {body}</div>
             </div>""",
             unsafe_allow_html=True,
@@ -1091,70 +1377,313 @@ with tabs[2]:
     for idx, (_, row) in enumerate(compare_df.head(4).iterrows()):
         strongest, weakest = country_strengths(row)
         with profile_cards[idx]:
-            st.metric(row["country"], f"{row['ai_overall_score']:.1f}", f"Rank {row['rank_ai_overall']:.0f}")
-            st.caption(f"Strongest: {strongest}")
-            st.caption(f"Weakest: {weakest}")
-            st.caption(f"GDP/capita: {row['gdp_display']}")
+            st.markdown(
+                f"""
+                <div class="profile-card">
+                    <div>
+                        <div class="profile-card-title">{row["country"]}</div>
+                        <div class="profile-card-score">{row["ai_overall_score"]:.1f}</div>
+                        <div class="profile-card-rank">AI rank {row["rank_ai_overall"]:.0f}</div>
+                    </div>
+                    <div>
+                        <div class="profile-card-detail"><b>Strongest:</b> {strongest}</div>
+                        <div class="profile-card-detail"><b>Weakest:</b> {weakest}</div>
+                        <div class="profile-card-detail"><b>GDP/capita:</b> {row["gdp_display"]}</div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 with tabs[3]:
     trend_countries = [country for country in selected_countries if country in country_options]
     if not trend_countries:
         trend_countries = filtered.nlargest(5, "ai_overall_score")["country"].tolist()
 
+    st.subheader("AI Growth Explorer")
+    st.caption(
+        "GDP and internet usage represent foundations; publications, patents, and private investment represent AI output."
+    )
+
     trend_metric = st.radio(
         "Trend metric",
-        options=["GDP per Capita", "Internet Usage"],
+        options=list(TREND_SOURCES.keys()),
         horizontal=True,
     )
 
+    trend_meta = TREND_SOURCES[trend_metric]
+    y_col = trend_meta["value_col"]
+    y_title = trend_meta["label"]
+    value_format = trend_meta["format"]
+
     if trend_metric == "GDP per Capita":
         trend_df = gdp_ts[gdp_ts["country"].isin(trend_countries)].copy()
-        y_col = "gdp_per_capita"
-        y_title = "GDP per Capita"
-    else:
+    elif trend_metric == "Internet Usage":
         trend_df = internet_ts[internet_ts["country"].isin(trend_countries)].copy()
-        y_col = "internet_usage_pct"
-        y_title = "Internet Usage (%)"
+    elif trend_metric == "AI Publications":
+        trend_df = ai_publications_ts[ai_publications_ts["country"].isin(trend_countries)].copy()
+    elif trend_metric == "AI Patents per Million":
+        trend_df = ai_patents_ts[ai_patents_ts["country"].isin(trend_countries)].copy()
+    else:
+        trend_df = ai_investment_ts[ai_investment_ts["country"].isin(trend_countries)].copy()
 
     trend_df = trend_df[trend_df["year"] >= 2000]
-    line_fig = px.line(
-        trend_df,
-        x="year",
-        y=y_col,
-        color="country",
-        markers=True,
-        title=f"{y_title} Trend since 2000",
-        template=PLOTLY_TEMPLATE,
-    )
-    line_fig.update_layout(
-        height=520,
-        xaxis_title="Year",
-        yaxis_title=y_title,
-        legend_title="Country",
-        margin=dict(l=0, r=0, t=55, b=0),
-    )
-    st.plotly_chart(line_fig, width="stretch")
+    if trend_df.empty:
+        st.warning(
+            "No data is available for the selected countries and metric. "
+            "Try selecting larger countries such as United States, China, India, United Kingdom, Germany, or Indonesia."
+        )
+    else:
+        latest_metrics = add_growth_metrics(trend_df, y_col)
+        latest_metrics = latest_metrics.merge(
+            df[["country", "ai_overall_score", "ai_research", "ai_development", "ai_commercial", "gdp_per_capita", "internet_usage_pct"]],
+            on="country",
+            how="left",
+        )
 
-    latest_trend = trend_df.sort_values("year").groupby("country", as_index=False).tail(1)
-    if not latest_trend.empty:
-        latest_fig = px.bar(
-            latest_trend.sort_values(y_col, ascending=True),
-            x=y_col,
-            y="country",
-            orientation="h",
-            title=f"Latest Available {y_title}",
-            color=y_col,
-            color_continuous_scale="Viridis",
+        leader = latest_metrics.nlargest(1, "latest_value").iloc[0]
+        growth_pool = latest_metrics.dropna(subset=["absolute_growth"])
+        growth_leader = growth_pool.nlargest(1, "absolute_growth").iloc[0]
+        selected_total = latest_metrics["latest_value"].sum()
+        avg_growth = latest_metrics["absolute_growth"].mean()
+
+        trend_kpis = st.columns(4)
+        trend_kpis[0].metric("Latest leader", leader["country"], format_trend_value(leader["latest_value"], value_format))
+        trend_kpis[1].metric("Fastest 5Y gain", growth_leader["country"], format_trend_value(growth_leader["absolute_growth"], value_format))
+        trend_kpis[2].metric("Selected total", format_trend_value(selected_total, value_format))
+        trend_kpis[3].metric("Average gain", format_trend_value(avg_growth, value_format))
+
+        line_fig = px.line(
+            trend_df,
+            x="year",
+            y=y_col,
+            color="country",
+            markers=True,
+            title=f"{y_title} over time",
             template=PLOTLY_TEMPLATE,
         )
-        latest_fig.update_layout(height=420, yaxis_title="", xaxis_title=y_title, coloraxis_showscale=False)
-        st.plotly_chart(latest_fig, width="stretch")
+        line_fig.update_layout(
+            height=520,
+            xaxis_title="Year",
+            yaxis_title=y_title,
+            legend_title="Country",
+            margin=dict(l=0, r=0, t=55, b=0),
+        )
+        st.plotly_chart(line_fig, width="stretch")
+
+        latest_left, latest_right = st.columns([1, 1])
+        with latest_left:
+            latest_fig = px.bar(
+                latest_metrics.sort_values("latest_value", ascending=True),
+                x="latest_value",
+                y="country",
+                orientation="h",
+                title=f"Latest {y_title}",
+                color="latest_value",
+                color_continuous_scale="Viridis",
+                hover_data={
+                    "latest_year": True,
+                    "baseline_year": True,
+                    "absolute_growth": ":,.2f",
+                    "ai_overall_score": ":.2f",
+                },
+                template=PLOTLY_TEMPLATE,
+            )
+            latest_fig.update_layout(height=460, yaxis_title="", xaxis_title=y_title, coloraxis_showscale=False)
+            st.plotly_chart(latest_fig, width="stretch")
+
+        with latest_right:
+            growth_fig = px.bar(
+                latest_metrics.sort_values("absolute_growth", ascending=True),
+                x="absolute_growth",
+                y="country",
+                orientation="h",
+                title="Baseline-to-latest growth",
+                color="absolute_growth",
+                color_continuous_scale="Tealgrn",
+                hover_data={
+                    "baseline_year": True,
+                    "latest_year": True,
+                    "baseline_value": ":,.2f",
+                    "latest_value": ":,.2f",
+                },
+                template=PLOTLY_TEMPLATE,
+            )
+            growth_fig.update_layout(height=460, yaxis_title="", xaxis_title=f"Growth in {y_title}", coloraxis_showscale=False)
+            st.plotly_chart(growth_fig, width="stretch")
+
+        ai_link_metric = "ai_research"
+        ai_link_label = "AI Research Score"
+        if trend_metric == "AI Patents per Million":
+            ai_link_metric = "ai_development"
+            ai_link_label = "AI Development Score"
+        elif trend_metric == "Private AI Investment":
+            ai_link_metric = "ai_commercial"
+            ai_link_label = "AI Commercial Score"
+        elif trend_metric in {"GDP per Capita", "Internet Usage"}:
+            ai_link_metric = "ai_overall_score"
+            ai_link_label = "AI Overall Score"
+
+        scatter_source = latest_metrics.dropna(subset=["latest_value", ai_link_metric]).copy()
+        if not scatter_source.empty:
+            scatter_fig = px.scatter(
+                scatter_source,
+                x="latest_value",
+                y=ai_link_metric,
+                size="ai_overall_score",
+                color="country",
+                hover_name="country",
+                hover_data={
+                    "latest_year": True,
+                    "latest_value": ":,.2f",
+                    "absolute_growth": ":,.2f",
+                    "ai_overall_score": ":.2f",
+                    "gdp_per_capita": ":,.0f",
+                    "internet_usage_pct": ":.2f",
+                },
+                title=f"Latest {y_title} vs {ai_link_label}",
+                template=PLOTLY_TEMPLATE,
+            )
+            scatter_fig.update_layout(
+                height=500,
+                xaxis_title=y_title,
+                yaxis_title=ai_link_label,
+                legend_title="Country",
+                margin=dict(l=0, r=0, t=55, b=0),
+            )
+            st.plotly_chart(scatter_fig, width="stretch")
+
+        st.markdown("#### Foundation vs AI Output")
+        st.caption("Compare a foundation metric against an AI output metric for the selected countries.")
+
+        relation_left, relation_right = st.columns([1, 1])
+        foundation_choice = relation_left.selectbox(
+            "Foundation to compare",
+            ["GDP per Capita - Economic Foundation", "Internet Usage - Digital Access"],
+        )
+        output_choice = relation_right.selectbox(
+            "AI output to compare",
+            [
+                "AI Publications - Research Output",
+                "AI Patents per Million - Innovation Output",
+                "Private AI Investment - Commercial Momentum",
+            ],
+        )
+
+        if foundation_choice.startswith("GDP"):
+            foundation_data = latest_values_for_countries(gdp_ts[gdp_ts["year"] >= 2000], "gdp_per_capita", trend_countries)
+            foundation_col = "gdp_per_capita"
+            foundation_label = "GDP per Capita"
+            foundation_format = "money"
+        else:
+            foundation_data = latest_values_for_countries(internet_ts[internet_ts["year"] >= 2000], "internet_usage_pct", trend_countries)
+            foundation_col = "internet_usage_pct"
+            foundation_label = "Internet Usage (%)"
+            foundation_format = "percent"
+
+        if output_choice.startswith("AI Publications"):
+            output_data = latest_values_for_countries(ai_publications_ts[ai_publications_ts["year"] >= 2000], "ai_publications", trend_countries)
+            output_col = "ai_publications"
+            output_label = "AI Publications"
+            output_format = "count"
+        elif output_choice.startswith("AI Patents"):
+            output_data = latest_values_for_countries(ai_patents_ts[ai_patents_ts["year"] >= 2000], "ai_patents_per_million", trend_countries)
+            output_col = "ai_patents_per_million"
+            output_label = "AI Patents per Million"
+            output_format = "decimal"
+        else:
+            output_data = latest_values_for_countries(ai_investment_ts[ai_investment_ts["year"] >= 2000], "ai_private_investment", trend_countries)
+            output_col = "ai_private_investment"
+            output_label = "Private AI Investment"
+            output_format = "money"
+
+        relation_data = foundation_data.merge(output_data, on="country", how="inner", suffixes=("_foundation", "_output"))
+        relation_data = relation_data.merge(
+            df[["country", "ai_overall_score", "region"]],
+            on="country",
+            how="left",
+        )
+
+        if relation_data.empty:
+            st.warning("No overlapping data is available for this country and metric combination.")
+        else:
+            median_foundation = relation_data[foundation_col].median()
+            median_output = relation_data[output_col].median()
+            relation_data["exploratory_zone"] = "Lower foundation / lower AI output"
+            relation_data.loc[
+                (relation_data[foundation_col] >= median_foundation) & (relation_data[output_col] >= median_output),
+                "exploratory_zone",
+            ] = "Higher foundation / higher AI output"
+            relation_data.loc[
+                (relation_data[foundation_col] >= median_foundation) & (relation_data[output_col] < median_output),
+                "exploratory_zone",
+            ] = "Higher foundation / lower AI output"
+            relation_data.loc[
+                (relation_data[foundation_col] < median_foundation) & (relation_data[output_col] >= median_output),
+                "exploratory_zone",
+            ] = "Lower foundation / higher AI output"
+
+            relation_fig = px.scatter(
+                relation_data,
+                x=foundation_col,
+                y=output_col,
+                size="ai_overall_score",
+                color="exploratory_zone",
+                hover_name="country",
+                hover_data={
+                    "region": True,
+                    "ai_overall_score": ":.2f",
+                    foundation_col: ":,.2f",
+                    output_col: ":,.2f",
+                    "latest_year_foundation": True,
+                    "latest_year_output": True,
+                },
+                title=f"Does {foundation_label} appear aligned with {output_label}?",
+                template=PLOTLY_TEMPLATE,
+            )
+            relation_fig.add_vline(x=median_foundation, line_dash="dash", line_color="#667085")
+            relation_fig.add_hline(y=median_output, line_dash="dash", line_color="#667085")
+            relation_fig.update_layout(
+                height=540,
+                xaxis_title=foundation_label,
+                yaxis_title=output_label,
+                legend_title="Exploratory zone",
+                margin=dict(l=0, r=0, t=55, b=0),
+            )
+            st.plotly_chart(relation_fig, width="stretch")
+
+            higher_foundation_lower_output = relation_data[
+                (relation_data[foundation_col] >= median_foundation) & (relation_data[output_col] < median_output)
+            ].sort_values(foundation_col, ascending=False)
+            lower_foundation_higher_output = relation_data[
+                (relation_data[foundation_col] < median_foundation) & (relation_data[output_col] >= median_output)
+            ].sort_values(output_col, ascending=False)
+
+            read_cols = st.columns(2)
+            if not higher_foundation_lower_output.empty:
+                candidate = higher_foundation_lower_output.iloc[0]
+                read_cols[0].warning(
+                    f"{candidate['country']} is worth exploring further: "
+                    f"{foundation_label} is relatively high ({format_trend_value(candidate[foundation_col], foundation_format)}), "
+                    f"but {output_label} is still relatively lower ({format_trend_value(candidate[output_col], output_format)})."
+                )
+            if not lower_foundation_higher_output.empty:
+                candidate = lower_foundation_higher_output.iloc[0]
+                read_cols[1].success(
+                    f"{candidate['country']} appears to overperform on AI output: "
+                    f"{output_label} is relatively high ({format_trend_value(candidate[output_col], output_format)}) "
+                    f"even though {foundation_label} is not as high as the comparison group."
+                )
+
+        st.info(
+            f"Source: {trend_meta['source_note']} "
+        )
 
 with tabs[4]:
     st.subheader("AI Prediction Simulator")
     st.write(
-        "Pilih fitur yang ingin dimasukkan ke model, lalu geser nilai fitur untuk melihat bagaimana prediksi AI score berubah. "
-        "Semakin besar koefisien positif, semakin besar dampak kenaikan nilai fitur terhadap AI score."
+        "Choose the features included in the model, then adjust their values to see how the predicted AI score changes. "
+        "A larger positive coefficient means that increasing the feature is associated with a higher AI score in this filtered data."
     )
 
     predict_country = st.selectbox(
@@ -1171,10 +1700,10 @@ with tabs[4]:
     )
 
     if not selected_predictors:
-        st.warning("Pilih minimal satu fitur prediksi.")
+        st.warning("Select at least one predictor feature.")
     else:
         intercept, weights, r2, model_data = train_regression_model(filtered, selected_predictors)
-        st.markdown(f"**Linear regression model**  \nR²: {r2:.3f}")
+        st.markdown(f"**Linear regression model**  \nR-squared: {r2:.3f}")
 
         coef_df = pd.DataFrame(
             {
@@ -1193,14 +1722,14 @@ with tabs[4]:
             recommendation_lines = []
             if top_positive:
                 recommendation_lines.append(
-                    f"Fitur paling berpengaruh naikkan AI score: {', '.join(top_positive)}."
+                    f"Features most associated with higher AI score: {', '.join(top_positive)}."
                 )
             if top_negative:
                 recommendation_lines.append(
-                    f"Fitur dengan dampak negatif jika naik: {', '.join(top_negative)}."
+                    f"Features associated with lower AI score when increased: {', '.join(top_negative)}."
                 )
             if recommendation_lines:
-                st.markdown("**Rekomendasi fitur:**")
+                st.markdown("**Feature notes:**")
                 for line in recommendation_lines:
                     st.markdown(f"- {line}")
 
