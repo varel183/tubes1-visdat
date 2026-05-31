@@ -193,22 +193,24 @@ st.markdown(
             border-radius: 8px;
             min-height: 112px;
             padding: 14px 16px;
-            background: #ffffff;
+            background: var(--secondary-background-color);
             box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
-        div[data-testid="stMetricLabel"] p {
+        div[data-testid="stMetricLabel"] {
             font-size: 0.82rem;
-            color: #101828 important!;
+            color: var(--text-color); 
+            opacity: 0.65;
             line-height: 1.25;
         }
     
         div[data-testid="stMetricValue"] {
             font-size: 1.45rem;
             line-height: 1.2;
-            color: #101828;
+            color: var(--text-color); 
+        
         }
         div[data-testid="stMetricDelta"] {
             line-height: 1.25;
@@ -227,7 +229,7 @@ st.markdown(
             border: 1px solid #e4e7ec;
             border-radius: 8px;
             padding: 14px 16px;
-            background: #ffffff;
+            background: var(--secondary-background-color);
             box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
             display: flex;
             flex-direction: column;
@@ -235,25 +237,25 @@ st.markdown(
             gap: 10px;
         }
         .profile-card-title {
-            color: #101828;
+            color: var(--text-color);
             font-size: 0.92rem;
             font-weight: 700;
             line-height: 1.25;
             margin-bottom: 2px;
         }
         .profile-card-score {
-            color: #101828;
+            color: var(--text-color);
             font-size: 1.55rem;
             font-weight: 700;
             line-height: 1.1;
         }
         .profile-card-rank {
-            color: #475467;
+            color: var(--text-color); 
             font-size: 0.78rem;
             line-height: 1.25;
         }
         .profile-card-detail {
-            color: #475467;
+            color: var(--text-color); 
             font-size: 0.78rem;
             line-height: 1.35;
             margin-top: 2px;
@@ -268,15 +270,14 @@ st.markdown(
             justify-content: space-between;
         }
         .insight-card-label {
-            font-size: 0.70rem;
-            font-weight: 600;
+            font-size: 0.90rem;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.07em;
             margin-bottom: 4px;
             opacity: 0.75;
         }
         .insight-card-title {
-            font-size: 1.05rem;
+            font-size: 1.35rem;
             font-weight: 600;
             margin-bottom: 6px;
             line-height: 1.25;
@@ -956,92 +957,8 @@ with tabs[0]:
     heatmap_fig.update_layout(height=500, margin=dict(l=0, r=0, t=55, b=0))
     st.plotly_chart(heatmap_fig, width="stretch")
 
-# with tabs[1]:
-#     quadrant_data = filtered.dropna(subset=["gdp_per_capita", "ai_overall_score"]).copy()
-#     quadrant_data = quadrant_data[quadrant_data["gdp_per_capita"] > 0]
-#     gdp_threshold = quadrant_data["gdp_per_capita"].median()
-#     ai_threshold = quadrant_data["ai_overall_score"].median()
-#     quadrant_data["quadrant"] = "Lower GDP - Lower AI"
-#     quadrant_data.loc[
-#         (quadrant_data["gdp_per_capita"] >= gdp_threshold)
-#         & (quadrant_data["ai_overall_score"] >= ai_threshold),
-#         "quadrant",
-#     ] = "Higher GDP - Higher AI"
-#     quadrant_data.loc[
-#         (quadrant_data["gdp_per_capita"] < gdp_threshold)
-#         & (quadrant_data["ai_overall_score"] >= ai_threshold),
-#         "quadrant",
-#     ] = "Lower GDP - Higher AI"
-#     quadrant_data.loc[
-#         (quadrant_data["gdp_per_capita"] >= gdp_threshold)
-#         & (quadrant_data["ai_overall_score"] < ai_threshold),
-#         "quadrant",
-#     ] = "Higher GDP - Lower AI"
-
-#     quadrant_fig = px.scatter(
-#         quadrant_data,
-#         x="gdp_per_capita",
-#         y="ai_overall_score",
-#         size="internet_usage_size",
-#         color="quadrant",
-#         hover_name="country",
-#         hover_data={
-#             "gdp_per_capita": ":,.0f",
-#             "ai_overall_score": ":.2f",
-#             "internet_usage_pct": ":.2f",
-#             "hdi": ":.3f",
-#             "internet_usage_size": False,
-#         },
-#         log_x=True,
-#         size_max=38,
-#         title="AI Readiness Quadrant: Economic Capacity vs AI Performance",
-#         template=PLOTLY_TEMPLATE,
-#     )
-#     quadrant_fig.add_hline(y=ai_threshold, line_dash="dash", line_color="#667085")
-#     quadrant_fig.add_vline(x=gdp_threshold, line_dash="dash", line_color="#667085")
-#     quadrant_fig.update_layout(
-#         height=620,
-#         xaxis_title="GDP per Capita (log scale)",
-#         yaxis_title="AI Overall Score",
-#         legend_title="Quadrant",
-#         margin=dict(l=0, r=0, t=55, b=0),
-#     )
-#     st.plotly_chart(quadrant_fig, width="stretch")
-
-#     gap_cols = st.columns(2)
-#     with gap_cols[0]:
-#         over = filtered.nlargest(10, "readiness_gap").sort_values("readiness_gap")
-#         over_fig = px.bar(
-#             over,
-#             x="readiness_gap",
-#             y="country",
-#             orientation="h",
-#             title="Overperformers: AI Score above Development Foundation",
-#             color="readiness_gap",
-#             color_continuous_scale="Tealgrn",
-#             template=PLOTLY_TEMPLATE,
-#         )
-#         over_fig.update_layout(height=420, yaxis_title="", xaxis_title="Readiness Gap")
-#         st.plotly_chart(over_fig, width="stretch")
-
-#     with gap_cols[1]:
-#         under = filtered.nsmallest(10, "readiness_gap").sort_values("readiness_gap", ascending=False)
-#         under_fig = px.bar(
-#             under,
-#             x="readiness_gap",
-#             y="country",
-#             orientation="h",
-#             title="Untapped Potential: Stronger Foundation than AI Score",
-#             color="readiness_gap",
-#             color_continuous_scale="RdBu",
-#             template=PLOTLY_TEMPLATE,
-#         )
-#         under_fig.update_layout(height=420, yaxis_title="", xaxis_title="Readiness Gap")
-#         st.plotly_chart(under_fig, width="stretch")
-
 with tabs[1]:
  
-    # Region filter, only shown when data has a region column.
     has_region = "region" in filtered.columns and filtered["region"].notna().any()
     if has_region:
         all_regions = sorted(filtered["region"].dropna().unique())
@@ -1063,7 +980,6 @@ with tabs[1]:
         st.info("No countries match the current region filter.")
         st.stop()
  
-    # Quadrant data prep.
     quadrant_data = explore_data.dropna(subset=["gdp_per_capita", "ai_overall_score"]).copy()
     quadrant_data = quadrant_data[quadrant_data["gdp_per_capita"] > 0]
     gdp_med = quadrant_data["gdp_per_capita"].median()
@@ -1083,9 +999,6 @@ with tabs[1]:
         "quadrant",
     ] = "Higher GDP - Lower AI"
  
-    # Similarity network data prep.
-    # Use all explore_data countries, filling NaN with medians rather than dropping rows.
-    # dropna on 11 columns kills most countries (any single missing value removes the row).
     sim_feature_cols = list(AI_DIMENSIONS.values()) + ["hdi", "internet_usage_pct"]
     sim_data = explore_data.copy().reset_index(drop=True)
  
@@ -1105,13 +1018,11 @@ with tabs[1]:
     countries_arr = sim_data["country"].tolist()
     n_c = len(countries_arr)
  
-    # Pairwise Euclidean distance to similarity.
     diffs = norm_vals[:, np.newaxis, :] - norm_vals[np.newaxis, :, :]   # (n, n, feats)
     dist_mat_full = np.sqrt((diffs ** 2).sum(axis=2))                    # (n, n)
     max_d = dist_mat_full.max() + 1e-8
     sim_mat = 1.0 - dist_mat_full / max_d                                # (n, n)
  
-    # Top row.
     top_left, top_right = st.columns([3, 2])
  
     with top_left:
@@ -1142,8 +1053,18 @@ with tabs[1]:
             xaxis_title="GDP per Capita (log scale)",
             yaxis_title="AI Overall Score",
             legend_title="",
-            legend=dict(orientation="h", yanchor="top", y=-0.24, xanchor="left", x=0.15),
-            margin=dict(l=0, r=0, t=30, b=0),
+            legend=dict(
+                orientation="h",
+                yanchor="top", y=-0.36,
+                xanchor="center", x=0.5,
+                font=dict(size=11, color="#344054"),
+                bgcolor="rgba(255,255,255,0.9)",
+                bordercolor="#E4E7EC",
+                borderwidth=1,
+                itemsizing="constant",
+                itemwidth=40,
+            ),
+            margin=dict(l=0, r=0, t=30, b=10),
         )
         st.plotly_chart(quadrant_fig, width="stretch")
  
@@ -1159,7 +1080,6 @@ with tabs[1]:
  
         ref_idx_global = countries_arr.index(ref_country) if ref_country in countries_arr else 0
  
-        # Select top 14 most similar + reference itself
         ref_sims = sim_mat[ref_idx_global].copy()
         ref_sims[ref_idx_global] = -1.0
         top_k = min(14, n_c - 1)
@@ -1171,10 +1091,8 @@ with tabs[1]:
             l for l, g in enumerate(display_set) if g == ref_idx_global
         )
  
-        # Build sub-similarity matrix and edges
         sub_sim = sim_mat[np.ix_(display_set, display_set)]
-        # Adaptive threshold: use top-30th-percentile of off-diagonal sub_sim values
-        # so edges always exist regardless of absolute similarity scale
+
         off_diag = sub_sim[np.triu_indices(n_disp, k=1)]
         EDGE_THRESHOLD = float(np.percentile(off_diag, 70)) if len(off_diag) > 0 else 0.5
         edge_tuples = tuple(
@@ -1192,7 +1110,6 @@ with tabs[1]:
  
         country_to_quad = dict(zip(quadrant_data["country"], quadrant_data["quadrant"]))
  
-        # Build node data lists in a single pass.
         peer_x, peer_y, peer_text, peer_color, peer_size = [], [], [], [], []
         peer_hover, peer_customdata = [], []
  
@@ -1221,15 +1138,11 @@ with tabs[1]:
  
         force_fig = go.Figure()
  
-        # Bucket edges by strength so thickness and opacity encode similarity.
-        # Edge weights are often in a narrow absolute range, so we
-        # normalise WITHIN the subgraph to stretch that range into visible contrast.
         if edge_tuples:
             ew_vals = np.array([ew for _, _, ew in edge_tuples])
             ew_min, ew_max = ew_vals.min(), ew_vals.max()
             ew_range = ew_max - ew_min if ew_max > ew_min else 1.0
  
-            # Three buckets: strong (top 33%), medium, weak (bottom 33%)
             buckets = {
                 "strong":  {"x": [], "y": [], "width": 3.5, "color": "rgba(29,158,117,0.75)"},
                 "medium":  {"x": [], "y": [], "width": 1.8, "color": "rgba(29,158,117,0.38)"},
@@ -1258,7 +1171,6 @@ with tabs[1]:
                         legendgroup="edges",
                     ))
  
-        # Trace 2: all peer nodes in one batch
         if peer_x:
             force_fig.add_trace(go.Scatter(
                 x=peer_x, y=peer_y,
@@ -1277,7 +1189,6 @@ with tabs[1]:
                 showlegend=False,
             ))
  
-        # Trace 3: reference node (always on top)
         force_fig.add_trace(go.Scatter(
             x=[ref_x], y=[ref_y],
             mode="markers+text",
@@ -1296,29 +1207,39 @@ with tabs[1]:
         ))
  
         force_fig.update_layout(
-            #title=f"Structural peers of {ref_country}; node size = AI score; line weight = similarity strength",
             height=460,
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, showline=False),
             yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, showline=False),
             legend=dict(
                 orientation="h", yanchor="top", y=-0.04,
                 xanchor="left", x=0, font=dict(size=11),
-                #tracegroupgap=0,
             ),
             margin=dict(l=0, r=0, t=45, b=10),
             template=PLOTLY_TEMPLATE,
-            plot_bgcolor="#f8fafc",
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
         )
         st.plotly_chart(force_fig, width="stretch")
  
     # Bottom row.
+    gap_df = explore_data.dropna(subset=["readiness_gap", "foundation_score", "ai_overall_score"]).copy()
+    gap_df = gap_df.sort_values("readiness_gap", ascending=False).reset_index(drop=True)
+    n_gap = len(gap_df)
+    half = max(1, n_gap // 2)
+ 
+    over  = gap_df.head(min(10, half)).sort_values("readiness_gap")        
+    under = gap_df.tail(min(10, half)).head(10).sort_values("readiness_gap", 
+                                                            ascending=False)
+ 
+    n_over  = len(over)
+    n_under = len(under)
+
+    over_height  = max(220, 48 + n_over  * 36)
+    under_height = max(220, 48 + n_under * 36)
+ 
     bot_left, bot_right = st.columns(2)
  
     with bot_left:
-        # Dumbbell chart: foundation score (gray) to actual AI score (teal).
-        # Sorted by how far AI exceeds foundation.
-        over = explore_data.nlargest(10, "readiness_gap").sort_values("readiness_gap")
- 
         over_fig = go.Figure()
         for _, row in over.iterrows():
             over_fig.add_trace(go.Scatter(
@@ -1329,6 +1250,11 @@ with tabs[1]:
                 showlegend=False,
                 hoverinfo="none",
             ))
+        
+        st.markdown(
+            "<h6 style='text-align: center;'>Overperformer Countries</h6>",
+            unsafe_allow_html=True
+        )
         over_fig.add_trace(go.Scatter(
             x=over["foundation_score"],
             y=over["country"],
@@ -1345,29 +1271,18 @@ with tabs[1]:
             marker=dict(color="#1D9E75", size=11, symbol="circle"),
             hovertemplate="<b>%{y}</b><br>AI score: %{x:.1f}<extra></extra>",
         ))
-        st.markdown(
-            "<h6 style='text-align: center;'>Overperformer Countries</h6>",
-            unsafe_allow_html=True
-        )
         over_fig.update_layout(
-            #title="Overperformer Countries",
-            #subtitle="Lowest gap of development foundation to AI score",
-            height=380,
-            xaxis_title="Score (0-100)",
+            height=over_height,
+            xaxis_title="Score (0–100)",
             yaxis_title="",
-            legend=dict(orientation="h", yanchor="bottom", y=0.98, xanchor="left", x=0.1),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
             margin=dict(l=0, r=0, t=0, b=0),
             template=PLOTLY_TEMPLATE,
         )
-        st.plotly_chart(over_fig, width="stretch")
+        st.plotly_chart(over_fig, use_container_width=True)
  
     with bot_right:
-        # Dumbbell chart mirroring overperformers but reversed: foundation (blue) > AI (red)
-        # Each country on its own row to avoid label stacking and ambiguous slopes.
-        under = explore_data.nsmallest(10, "readiness_gap").sort_values("readiness_gap", ascending=False)
- 
         under_fig = go.Figure()
- 
         for _, row in under.iterrows():
             under_fig.add_trace(go.Scatter(
                 x=[row["ai_overall_score"], row["foundation_score"]],
@@ -1398,15 +1313,18 @@ with tabs[1]:
             unsafe_allow_html=True
         )
         under_fig.update_layout(
-            #title="Untapped Potential",
-            height=380,
-            xaxis_title="Score (0-100)",
+            height=under_height,
+            xaxis_title="Score (0–100)",
             yaxis_title="",
-            legend=dict(orientation="h", yanchor="bottom", y=0.98, xanchor="left", x=0.1),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
             margin=dict(l=0, r=0, t=0, b=0),
             template=PLOTLY_TEMPLATE,
         )
-        st.plotly_chart(under_fig, width="stretch")
+        st.plotly_chart(under_fig, use_container_width=True)
+ 
+        over = explore_data.nlargest(10, "readiness_gap").sort_values("readiness_gap")
+ 
+    
  
     # Insight cards below the charts.
     top_over = explore_data.nlargest(1, "readiness_gap").iloc[0]
@@ -1430,7 +1348,7 @@ with tabs[1]:
             "and GDP would predict, the biggest positive gap in this filter.",
         ),
         (
-            "#E6F1FB", "#0C447C",
+            "#FBE7E6", "#7C0E0C",
             "Untapped potential",
             top_under["country"],
             f"Development foundation score of <b>{top_under['foundation_score']:.1f}</b> "
@@ -1440,7 +1358,7 @@ with tabs[1]:
         ),
         (
             "#C2E6FF", "#0D2134",
-            f"Closest structural peer to {ref_country}",
+            f"Closest peer to {ref_country}",
             most_sim_name,
             f"Similarity score: <b>{most_sim_score:.2f}</b> across all AI dimensions, "
             f"the most comparable country to {ref_country} in the dataset.",
@@ -1452,10 +1370,10 @@ with tabs[1]:
     for col, (bg, tc, label, title, body) in zip(card_cols, cards):
         col.markdown(
             f"""<div class="insight-card" style="background:{bg};color:{tc};">
-                <div class="insight-card-label" style="color:{tc};">
-                    {label}</div>
                 <div class="insight-card-title" style="color:{tc};">
                     {title}</div>
+                <div class="insight-card-label" style="color:{tc};">
+                    the {label}</div>
                 <div class="insight-card-body" style="color:{tc};">
                     {body}</div>
             </div>""",
