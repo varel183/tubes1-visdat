@@ -610,35 +610,29 @@ def build_insights(data: pd.DataFrame, selected_metric_label: str, selected_metr
 
 def compute_dimension_regressions(data: pd.DataFrame) -> pd.DataFrame:
     rows = []
+
     for label, col in AI_DIMENSIONS.items():
         if col not in data.columns:
             continue
 
-        reg_data = data[[col, "ai_overall_score"]].dropna()
-        if len(reg_data) < 3:
+        corr_data = data[[col, "ai_overall_score"]].dropna()
+        if len(corr_data) < 3:
             continue
 
-        x = reg_data[col].astype(float).to_numpy()
-        y = reg_data["ai_overall_score"].astype(float).to_numpy()
-
-        x_design = np.vstack([np.ones(len(x)), x]).T
-        intercept, slope = np.linalg.lstsq(x_design, y, rcond=None)[0]
-        y_pred = intercept + slope * x
-
-        ss_res = float(np.sum((y - y_pred) ** 2))
-        ss_tot = float(np.sum((y - y.mean()) ** 2))
-        r_squared = 1 - ss_res / ss_tot if ss_tot > 0 else np.nan
+        spearman_corr = corr_data[col].corr(
+            corr_data["ai_overall_score"],
+            method="spearman",
+        )
 
         rows.append(
             {
                 "dimension": label,
-                "coefficient": float(slope),
-                "r_squared": float(r_squared),
+                "spearman": float(spearman_corr),
             }
         )
 
-    reg_df = pd.DataFrame(rows).dropna(subset=["r_squared"])
-    return reg_df.sort_values("r_squared", ascending=False)
+    reg_df = pd.DataFrame(rows).dropna(subset=["spearman"])
+    return reg_df.sort_values("spearman", ascending=False)
 
 
 def render_dimension_pillar_cards() -> None:
@@ -821,20 +815,19 @@ with tabs[0]:
         if dimension_regressions.empty:
             st.info("Not enough data to calculate regression strength.")
         else:
-            reg_plot = dimension_regressions.sort_values("r_squared", ascending=True)
+            reg_plot = dimension_regressions.sort_values("spearman", ascending=True)
             regression_fig = px.bar(
                 reg_plot,
-                x="r_squared",
+                x="spearman",
                 y="dimension",
                 orientation="h",
-                text="r_squared",
-                color="r_squared",
+                text="spearman",
+                color="spearman",
                 color_continuous_scale="Viridis",
                 title=None,
                 hover_data={
                     "dimension": False,
-                    "r_squared": ":.3f",
-                    "coefficient": ":.3f",
+                    "spearman": ":.3f",
                 },
                 template=PLOTLY_TEMPLATE,
             )
@@ -842,8 +835,10 @@ with tabs[0]:
             regression_fig.update_layout(
                 height=260,
                 yaxis_title="",
-                xaxis_title="R²",
-                xaxis=dict(range=[0, max(1, float(dimension_regressions["r_squared"].max()) + 0.08)]),
+                xaxis_title="Spearman Correlation",
+                xaxis=dict(
+                    range=[0, min(1, float(dimension_regressions["spearman"].max()) + 0.1)]
+                ),
                 margin=dict(l=0, r=25, t=8, b=0),
                 coloraxis_showscale=False,
             )
