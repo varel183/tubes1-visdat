@@ -181,20 +181,36 @@ st.set_page_config(
     layout="wide",
 )
 
+IS_DARK_THEME = (st.get_option("theme.base") or "").lower() == "dark"
+PLOTLY_TEMPLATE = "plotly_dark" if IS_DARK_THEME else "plotly_white"
+PLOT_FONT_COLOR = "#E5E7EB" if IS_DARK_THEME else "#344054"
+PLOT_GRID_COLOR = "rgba(229, 231, 235, 0.16)" if IS_DARK_THEME else "rgba(102, 112, 133, 0.22)"
+PLOT_LINE_COLOR = "#98A2B3" if IS_DARK_THEME else "#667085"
+PLOT_LEGEND_BG = "rgba(17, 24, 39, 0.86)" if IS_DARK_THEME else "rgba(255,255,255,0.9)"
+PLOT_LEGEND_BORDER = "rgba(229, 231, 235, 0.18)" if IS_DARK_THEME else "#E4E7EC"
+MAP_LAND_COLOR = "#1F2937" if IS_DARK_THEME else "#f8fafc"
+MAP_OCEAN_COLOR = "#0B1220" if IS_DARK_THEME else "#e6f0f7"
+
 st.markdown(
     """
     <style>
+        :root {
+            --dashboard-border: rgba(148, 163, 184, 0.32);
+            --dashboard-card-bg: rgba(148, 163, 184, 0.08);
+            --dashboard-shadow: none;
+            --dashboard-muted: rgba(148, 163, 184, 0.96);
+        }
         .block-container {
             padding-top: 1.6rem;
             padding-bottom: 2rem;
         }
         div[data-testid="stMetric"] {
-            border: 1px solid #e4e7ec;
+            border: 1px solid var(--dashboard-border);
             border-radius: 8px;
             min-height: 112px;
             padding: 14px 16px;
-            background: var(--secondary-background-color);
-            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+            background: var(--dashboard-card-bg);
+            box-shadow: 0 1px 2px var(--dashboard-shadow);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -230,11 +246,11 @@ st.markdown(
         }
         .profile-card {
             min-height: 150px;
-            border: 1px solid #e4e7ec;
+            border: 1px solid var(--dashboard-border);
             border-radius: 8px;
             padding: 14px 16px;
-            background: var(--secondary-background-color);
-            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+            background: var(--dashboard-card-bg);
+            box-shadow: 0 1px 2px var(--dashboard-shadow);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -290,6 +306,24 @@ st.markdown(
             font-size: 0.82rem;
             line-height: 1.55;
             opacity: 0.9;
+        }
+        .pillar-card {
+            border: 1px solid var(--dashboard-border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            background: var(--dashboard-card-bg);
+            line-height: 1.2;
+        }
+        .pillar-card-title {
+            color: var(--text-color);
+            font-size: 0.80rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .pillar-card-detail {
+            color: var(--dashboard-muted);
+            font-size: 0.78rem;
         }
     </style>
     """,
@@ -527,6 +561,53 @@ def format_trend_value(value: float, value_format: str) -> str:
     return format_number(value)
 
 
+def style_plot(fig: go.Figure) -> go.Figure:
+    title_text = fig.layout.title.text
+    if title_text is None or str(title_text).lower() in {"none", "undefined"}:
+        title_text = ""
+
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color=PLOT_FONT_COLOR),
+        title=dict(text=title_text, font=dict(color=PLOT_FONT_COLOR)),
+        legend=dict(
+            bgcolor=PLOT_LEGEND_BG,
+            bordercolor=PLOT_LEGEND_BORDER,
+            borderwidth=0,
+        ),
+    )
+    fig.update_xaxes(
+        gridcolor=PLOT_GRID_COLOR,
+        zerolinecolor=PLOT_GRID_COLOR,
+        linecolor=PLOT_GRID_COLOR,
+        tickfont=dict(color=PLOT_FONT_COLOR),
+        title_font=dict(color=PLOT_FONT_COLOR),
+    )
+    fig.update_yaxes(
+        gridcolor=PLOT_GRID_COLOR,
+        zerolinecolor=PLOT_GRID_COLOR,
+        linecolor=PLOT_GRID_COLOR,
+        tickfont=dict(color=PLOT_FONT_COLOR),
+        title_font=dict(color=PLOT_FONT_COLOR),
+    )
+    fig.update_polars(
+        bgcolor="rgba(0,0,0,0)",
+        radialaxis=dict(
+            gridcolor=PLOT_GRID_COLOR,
+            linecolor=PLOT_GRID_COLOR,
+            tickfont=dict(color=PLOT_FONT_COLOR),
+        ),
+        angularaxis=dict(
+            gridcolor=PLOT_GRID_COLOR,
+            linecolor=PLOT_GRID_COLOR,
+            tickfont=dict(color=PLOT_FONT_COLOR),
+        ),
+    )
+    fig.update_geos(bgcolor="rgba(0,0,0,0)")
+    return fig
+
+
 def add_growth_metrics(data: pd.DataFrame, value_col: str) -> pd.DataFrame:
     if data.empty:
         return data
@@ -654,28 +735,9 @@ def render_dimension_pillar_cards() -> None:
     for pillar, subpillars in pillars:
         st.markdown(
             f"""
-            <div style="
-                border:1px solid #e4e7ec;
-                border-radius:8px;
-                padding:8px 10px;
-                margin-bottom:6px;
-                background:#ffffff;
-                line-height:1.2;
-            ">
-                <div style="
-                    font-size:0.80rem;
-                    font-weight:600;
-                    color:#101828;
-                    margin-bottom:2px;
-                ">
-                    {pillar}
-                </div>
-                <div style="
-                    font-size:0.78rem;
-                    color:#475467;
-                ">
-                    {subpillars}
-                </div>
+            <div class="pillar-card">
+                <div class="pillar-card-title">{pillar}</div>
+                <div class="pillar-card-detail">{subpillars}</div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -829,7 +891,7 @@ with tabs[0]:
                 text="spearman",
                 color="spearman",
                 color_continuous_scale="Viridis",
-                title=None,
+                title="",
                 hover_data={
                     "dimension": False,
                     "spearman": ":.3f",
@@ -847,7 +909,7 @@ with tabs[0]:
                 margin=dict(l=0, r=25, t=8, b=0),
                 coloraxis_showscale=False,
             )
-            st.plotly_chart(regression_fig, width="stretch")
+            st.plotly_chart(style_plot(regression_fig), width="stretch")
 
     # st.markdown("---")
 
@@ -866,8 +928,8 @@ with tabs[0]:
         showcountries=True,
         showcoastlines=True,
         showland=True,
-        landcolor="#f8fafc",
-        oceancolor="#e6f0f7",
+        landcolor=MAP_LAND_COLOR,
+        oceancolor=MAP_OCEAN_COLOR,
         showocean=True,
     )
     map_fig.update_layout(
@@ -878,7 +940,7 @@ with tabs[0]:
 
     left, right = st.columns([1.35, 1])
     with left:
-        st.plotly_chart(map_fig, width="stretch")
+        st.plotly_chart(style_plot(map_fig), width="stretch")
 
     with right:
         base_ranking = filtered.nlargest(top_n, selected_metric).copy()
@@ -919,7 +981,7 @@ with tabs[0]:
             margin=dict(l=0, r=0, t=55, b=0),
             coloraxis_showscale=False,
         )
-        st.plotly_chart(bar_fig, width="stretch")
+        st.plotly_chart(style_plot(bar_fig), width="stretch")
 
     heatmap_source = filtered.nlargest(top_n, "ai_overall_score").copy()
     selected_heat = filtered[filtered["country"].isin(selected_countries)].copy()
@@ -959,7 +1021,7 @@ with tabs[0]:
         )
 
     heatmap_fig.update_layout(height=500, margin=dict(l=0, r=0, t=55, b=0))
-    st.plotly_chart(heatmap_fig, width="stretch")
+    st.plotly_chart(style_plot(heatmap_fig), width="stretch")
 
 with tabs[1]:
  
@@ -1050,8 +1112,8 @@ with tabs[1]:
             size_max=18,
             template=PLOTLY_TEMPLATE,
         )
-        quadrant_fig.add_hline(y=ai_med, line_dash="dash", line_color="#667085", line_width=1)
-        quadrant_fig.add_vline(x=gdp_med, line_dash="dash", line_color="#667085", line_width=1)
+        quadrant_fig.add_hline(y=ai_med, line_dash="dash", line_color=PLOT_LINE_COLOR, line_width=1)
+        quadrant_fig.add_vline(x=gdp_med, line_dash="dash", line_color=PLOT_LINE_COLOR, line_width=1)
         quadrant_fig.update_layout(
             height=460,
             xaxis_title="GDP per Capita (log scale)",
@@ -1061,16 +1123,16 @@ with tabs[1]:
                 orientation="h",
                 yanchor="top", y=-0.36,
                 xanchor="center", x=0.5,
-                font=dict(size=11, color="#344054"),
-                bgcolor="rgba(255,255,255,0.9)",
-                bordercolor="#E4E7EC",
+                font=dict(size=11, color=PLOT_FONT_COLOR),
+                bgcolor=PLOT_LEGEND_BG,
+                bordercolor=PLOT_LEGEND_BORDER,
                 borderwidth=1,
                 itemsizing="constant",
                 itemwidth=40,
             ),
             margin=dict(l=0, r=0, t=30, b=10),
         )
-        st.plotly_chart(quadrant_fig, width="stretch")
+        st.plotly_chart(style_plot(quadrant_fig), width="stretch")
  
     with top_right:
         ref_options = sorted(explore_data["country"].dropna().unique())
@@ -1223,7 +1285,7 @@ with tabs[1]:
             plot_bgcolor="rgba(0,0,0,0)",
             paper_bgcolor="rgba(0,0,0,0)",
         )
-        st.plotly_chart(force_fig, width="stretch")
+        st.plotly_chart(style_plot(force_fig), width="stretch")
  
     # Bottom row.
     gap_df = explore_data.dropna(subset=["readiness_gap", "foundation_score", "ai_overall_score"]).copy()
@@ -1283,7 +1345,7 @@ with tabs[1]:
             margin=dict(l=0, r=0, t=0, b=0),
             template=PLOTLY_TEMPLATE,
         )
-        st.plotly_chart(over_fig, use_container_width=True)
+        st.plotly_chart(style_plot(over_fig), width="stretch")
  
     with bot_right:
         under_fig = go.Figure()
@@ -1324,7 +1386,7 @@ with tabs[1]:
             margin=dict(l=0, r=0, t=0, b=0),
             template=PLOTLY_TEMPLATE,
         )
-        st.plotly_chart(under_fig, use_container_width=True)
+        st.plotly_chart(style_plot(under_fig), width="stretch")
  
         over = explore_data.nlargest(10, "readiness_gap").sort_values("readiness_gap")
  
@@ -1439,9 +1501,9 @@ with tabs[2]:
 
     radar_col, compare_bar_col = st.columns([1, 1])
     with radar_col:
-        st.plotly_chart(radar_fig, width="stretch")
+        st.plotly_chart(style_plot(radar_fig), width="stretch")
     with compare_bar_col:
-        st.plotly_chart(compare_bar_fig, width="stretch")
+        st.plotly_chart(style_plot(compare_bar_fig), width="stretch")
 
     compare_df = compare_df.sort_values("rank_ai_overall")
     visible_profiles = compare_df.head(4)
@@ -1582,7 +1644,7 @@ with tabs[3]:
             legend_title="Country",
             margin=dict(l=0, r=0, t=55, b=0),
         )
-        st.plotly_chart(line_fig, width="stretch")
+        st.plotly_chart(style_plot(line_fig), width="stretch")
 
         latest_left, latest_right = st.columns([1, 1])
         with latest_left:
@@ -1603,7 +1665,7 @@ with tabs[3]:
                 template=PLOTLY_TEMPLATE,
             )
             latest_fig.update_layout(height=460, yaxis_title="", xaxis_title=y_title, coloraxis_showscale=False)
-            st.plotly_chart(latest_fig, width="stretch")
+            st.plotly_chart(style_plot(latest_fig), width="stretch")
 
         with latest_right:
             growth_fig = px.bar(
@@ -1623,7 +1685,7 @@ with tabs[3]:
                 template=PLOTLY_TEMPLATE,
             )
             growth_fig.update_layout(height=460, yaxis_title="", xaxis_title=f"Growth in {y_title}", coloraxis_showscale=False)
-            st.plotly_chart(growth_fig, width="stretch")
+            st.plotly_chart(style_plot(growth_fig), width="stretch")
 
         ai_link_metric = "ai_research"
         ai_link_label = "AI Research Score"
@@ -1664,7 +1726,7 @@ with tabs[3]:
                 legend_title="Country",
                 margin=dict(l=0, r=0, t=55, b=0),
             )
-            st.plotly_chart(scatter_fig, width="stretch")
+            st.plotly_chart(style_plot(scatter_fig), width="stretch")
 
         st.markdown("#### Foundation vs AI Output")
         st.caption("Compare a foundation metric against an AI output metric for the selected countries.")
@@ -1754,8 +1816,8 @@ with tabs[3]:
                 title=f"Does {foundation_label} appear aligned with {output_label}?",
                 template=PLOTLY_TEMPLATE,
             )
-            relation_fig.add_vline(x=median_foundation, line_dash="dash", line_color="#667085")
-            relation_fig.add_hline(y=median_output, line_dash="dash", line_color="#667085")
+            relation_fig.add_vline(x=median_foundation, line_dash="dash", line_color=PLOT_LINE_COLOR)
+            relation_fig.add_hline(y=median_output, line_dash="dash", line_color=PLOT_LINE_COLOR)
             relation_fig.update_layout(
                 height=540,
                 xaxis_title=foundation_label,
@@ -1763,7 +1825,7 @@ with tabs[3]:
                 legend_title="Exploratory zone",
                 margin=dict(l=0, r=0, t=55, b=0),
             )
-            st.plotly_chart(relation_fig, width="stretch")
+            st.plotly_chart(style_plot(relation_fig), width="stretch")
 
             higher_foundation_lower_output = relation_data[
                 (relation_data[foundation_col] >= median_foundation) & (relation_data[output_col] < median_output)
@@ -1897,10 +1959,10 @@ with tabs[4]:
                 y0=min_val,
                 x1=max_val,
                 y1=max_val,
-                line=dict(dash="dash", color="#667085"),
+                line=dict(dash="dash", color=PLOT_LINE_COLOR),
             )
             scatter_fig.update_layout(height=520, margin=dict(l=0, r=0, t=55, b=0))
-            st.plotly_chart(scatter_fig, width="stretch")
+            st.plotly_chart(style_plot(scatter_fig), width="stretch")
 
 with tabs[5]:
     display_cols = [
