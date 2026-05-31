@@ -909,6 +909,7 @@ with tabs[0]:
                 margin=dict(l=0, r=25, t=8, b=0),
                 coloraxis_showscale=False,
             )
+            st.caption(f"{strongest_predictor} has the strongest correlation with the Overall AI Score in the currently filtered data.")
             st.plotly_chart(style_plot(regression_fig), width="stretch")
 
     # st.markdown("---")
@@ -940,6 +941,7 @@ with tabs[0]:
 
     left, right = st.columns([1.35, 1])
     with left:
+        st.caption(f"This map shows the global distribution of {selected_metric_label}; darker or stronger colors indicate countries with higher scores.")
         st.plotly_chart(style_plot(map_fig), width="stretch")
 
     with right:
@@ -981,6 +983,8 @@ with tabs[0]:
             margin=dict(l=0, r=0, t=55, b=0),
             coloraxis_showscale=False,
         )
+        top_rank_country = ranking.sort_values(selected_metric, ascending=False).iloc[0]["country"] if not ranking.empty else "-"
+        st.caption(f"Insight: {top_rank_country} has the highest {selected_metric_label} among the countries shown in this ranking.")
         st.plotly_chart(style_plot(bar_fig), width="stretch")
 
     heatmap_source = filtered.nlargest(top_n, "ai_overall_score").copy()
@@ -1021,6 +1025,7 @@ with tabs[0]:
         )
 
     heatmap_fig.update_layout(height=500, margin=dict(l=0, r=0, t=55, b=0))
+    st.caption("This heatmap helps identify each country's AI strengths and weaknesses quickly through differences in color intensity.")
     st.plotly_chart(style_plot(heatmap_fig), width="stretch")
 
 with tabs[1]:
@@ -1132,6 +1137,7 @@ with tabs[1]:
             ),
             margin=dict(l=0, r=0, t=30, b=10),
         )
+        st.caption("This quadrant chart shows whether a country's AI readiness aligns with its economic foundation or whether it overperforms or underperforms.")
         st.plotly_chart(style_plot(quadrant_fig), width="stretch")
  
     with top_right:
@@ -1285,6 +1291,7 @@ with tabs[1]:
             plot_bgcolor="rgba(0,0,0,0)",
             paper_bgcolor="rgba(0,0,0,0)",
         )
+        st.caption(f"This network graph shows the countries most structurally similar to {ref_country} based on AI dimensions and development foundations.")
         st.plotly_chart(style_plot(force_fig), width="stretch")
  
     # Bottom row.
@@ -1345,6 +1352,7 @@ with tabs[1]:
             margin=dict(l=0, r=0, t=0, b=0),
             template=PLOTLY_TEMPLATE,
         )
+        st.caption("Countries in this chart have AI Scores higher than their foundation scores, so they can be interpreted as overperformers.")
         st.plotly_chart(style_plot(over_fig), width="stretch")
  
     with bot_right:
@@ -1386,6 +1394,7 @@ with tabs[1]:
             margin=dict(l=0, r=0, t=0, b=0),
             template=PLOTLY_TEMPLATE,
         )
+        st.caption("Countries in this chart have foundation scores higher than their AI Scores, suggesting untapped AI potential.")
         st.plotly_chart(style_plot(under_fig), width="stretch")
  
         over = explore_data.nlargest(10, "readiness_gap").sort_values("readiness_gap")
@@ -1501,8 +1510,10 @@ with tabs[2]:
 
     radar_col, compare_bar_col = st.columns([1, 1])
     with radar_col:
+        st.caption("This radar chart shows the AI dimension profiles, strengths, and weaknesses of the selected countries.")
         st.plotly_chart(style_plot(radar_fig), width="stretch")
     with compare_bar_col:
+        st.caption("This bar chart compares AI readiness with supporting indicators such as HDI and internet usage for the selected countries.")
         st.plotly_chart(style_plot(compare_bar_fig), width="stretch")
 
     compare_df = compare_df.sort_values("rank_ai_overall")
@@ -1644,6 +1655,7 @@ with tabs[3]:
             legend_title="Country",
             margin=dict(l=0, r=0, t=55, b=0),
         )
+        st.caption(f"This line chart shows how {y_title} changes over time, making it easier to see which countries grow most consistently.")
         st.plotly_chart(style_plot(line_fig), width="stretch")
 
         latest_left, latest_right = st.columns([1, 1])
@@ -1665,6 +1677,7 @@ with tabs[3]:
                 template=PLOTLY_TEMPLATE,
             )
             latest_fig.update_layout(height=460, yaxis_title="", xaxis_title=y_title, coloraxis_showscale=False)
+            st.caption(f"This chart highlights which selected countries have the highest latest values for {y_title}.")
             st.plotly_chart(style_plot(latest_fig), width="stretch")
 
         with latest_right:
@@ -1685,6 +1698,7 @@ with tabs[3]:
                 template=PLOTLY_TEMPLATE,
             )
             growth_fig.update_layout(height=460, yaxis_title="", xaxis_title=f"Growth in {y_title}", coloraxis_showscale=False)
+            st.caption(f"This growth chart shows which countries experienced the largest increase in {y_title} from the baseline year to the latest year.")
             st.plotly_chart(style_plot(growth_fig), width="stretch")
 
         ai_link_metric = "ai_research"
@@ -1726,6 +1740,7 @@ with tabs[3]:
                 legend_title="Country",
                 margin=dict(l=0, r=0, t=55, b=0),
             )
+            st.caption(f"This scatter plot helps examine whether the latest {y_title} is related to {ai_link_label} among the selected countries.")
             st.plotly_chart(style_plot(scatter_fig), width="stretch")
 
         st.markdown("#### Foundation vs AI Output")
@@ -1825,6 +1840,7 @@ with tabs[3]:
                 legend_title="Exploratory zone",
                 margin=dict(l=0, r=0, t=55, b=0),
             )
+            st.caption(f"This chart shows whether {foundation_label} aligns with {output_label}, or whether some countries lag behind or stand out from the group.")
             st.plotly_chart(style_plot(relation_fig), width="stretch")
 
             higher_foundation_lower_output = relation_data[
@@ -1962,6 +1978,7 @@ with tabs[4]:
                 line=dict(dash="dash", color=PLOT_LINE_COLOR),
             )
             scatter_fig.update_layout(height=520, margin=dict(l=0, r=0, t=55, b=0))
+            st.caption("Points closer to the dashed line indicate model predictions that are closer to the actual AI Score.")
             st.plotly_chart(style_plot(scatter_fig), width="stretch")
 
 with tabs[5]:
