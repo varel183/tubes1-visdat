@@ -207,10 +207,14 @@ st.markdown(
         }
     
         div[data-testid="stMetricValue"] {
-            font-size: 1.45rem;
+            font-size: 1.25rem;
             line-height: 1.2;
             color: var(--text-color); 
-        
+        }
+        div[data-testid="stMetricValue"] > div {
+            overflow: visible;
+            text-overflow: clip;
+            white-space: normal;
         }
         div[data-testid="stMetricDelta"] {
             line-height: 1.25;
@@ -896,7 +900,7 @@ with tabs[0]:
             orientation="h",
             color=selected_metric,
             color_continuous_scale="Viridis",
-            title=f"Top {top_n} Countries + Comparison Countries by {selected_metric_label}",
+            title=f"Top {top_n} + Comparison Countries",
             hover_name="country",
             hover_data={
                 selected_metric: ":.2f",
@@ -1404,7 +1408,7 @@ with tabs[2]:
         title="AI Dimension Radar Comparison",
         polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
         height=560,
-        margin=dict(l=30, r=30, t=70, b=30),
+        margin=dict(l=90, r=30, t=70, b=30),
         template=PLOTLY_TEMPLATE,
     )
 
@@ -1912,6 +1916,18 @@ with tabs[5]:
     ]
     display_cols = list(dict.fromkeys(display_cols))
     table_data = filtered[display_cols].sort_values("ai_overall_score", ascending=False)
+    table_labels = {
+        "country": "Country",
+        "ai_overall_score": "AI Overall Score",
+        selected_metric: selected_metric_label,
+        "hdi": "HDI",
+        "internet_usage_pct": "Internet Usage (%)",
+        "gdp_per_capita": "GDP per Capita",
+        "foundation_score": "Foundation Score",
+        "readiness_gap": "Readiness Gap",
+        "rank_ai_overall": "AI Overall Rank",
+    }
+    table_data = table_data.rename(columns=table_labels)
     st.dataframe(table_data, width="stretch", hide_index=True)
 
     csv_data = table_data.to_csv(index=False).encode("utf-8")
