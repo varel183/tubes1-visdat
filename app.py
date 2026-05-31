@@ -21,8 +21,6 @@ AI_METRICS = {
     "Development": "ai_development",
     "Government Strategy": "ai_government_strategy",
     "Commercial": "ai_commercial",
-    "Scale": "ai_scale",
-    "Intensity": "ai_intensity",
 }
 
 AI_DIMENSIONS = {label: col for label, col in AI_METRICS.items() if col != "ai_overall_score"}
@@ -51,8 +49,6 @@ PREDICTOR_FEATURES = [
     "ai_development",
     "ai_government_strategy",
     "ai_commercial",
-    "ai_scale",
-    "ai_intensity",
 ]
 
 PLOTLY_TEMPLATE = "plotly_white"
@@ -102,8 +98,6 @@ def load_ai_data() -> pd.DataFrame:
         "ai_development",
         "ai_government_strategy",
         "ai_commercial",
-        "ai_scale",
-        "ai_intensity",
         "hdi",
         "expected_years_of_schooling",
         "mean_years_of_schooling",
@@ -325,6 +319,59 @@ def build_insights(data: pd.DataFrame, selected_metric_label: str, selected_metr
     return insights
 
 
+
+
+def compute_dimension_regressions(data: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    for label, col in AI_DIMENSIONS.items():
+        if col not in data.columns:
+            continue
+
+        reg_data = data[[col, "ai_overall_score"]].dropna()
+        if len(reg_data) < 3:
+            continue
+
+        x = reg_data[col].astype(float).to_numpy()
+        y = reg_data["ai_overall_score"].astype(float).to_numpy()
+
+        x_design = np.vstack([np.ones(len(x)), x]).T
+        intercept, slope = np.linalg.lstsq(x_design, y, rcond=None)[0]
+        y_pred = intercept + slope * x
+
+        ss_res = float(np.sum((y - y_pred) ** 2))
+        ss_tot = float(np.sum((y - y.mean()) ** 2))
+        r_squared = 1 - ss_res / ss_tot if ss_tot > 0 else np.nan
+
+        rows.append(
+            {
+                "dimension": label,
+                "coefficient": float(slope),
+                "r_squared": float(r_squared),
+            }
+        )
+
+    reg_df = pd.DataFrame(rows).dropna(subset=["r_squared"])
+    return reg_df.sort_values("r_squared", ascending=False)
+
+
+def render_dimension_pillar_cards() -> None:
+    st.caption(
+        "The Global AI Index uses 122 indicators from 24 public and private data sources "
+        "and 83 governments, grouped into 3 pillars and 7 sub-pillars."
+    )
+
+    pillars = [
+        ("Implementation", "Talent · Infrastructure · Operating Environment"),
+        ("Innovation", "Research · Development"),
+        ("Investment", "Government Strategy · Commercial"),
+    ]
+
+    for pillar, subpillars in pillars:
+        with st.container(border=True):
+            st.markdown(f"**{pillar}**")
+            st.caption(f"{subpillars}")
+
+
 @st.cache_data
 def train_regression_model(data: pd.DataFrame, feature_cols: list[str], target_col: str = "ai_overall_score") -> tuple[float, dict[str, float], float, pd.DataFrame]:
     model_data = data.dropna(subset=feature_cols + [target_col]).copy()
@@ -429,6 +476,10 @@ average_ai = filtered["ai_overall_score"].mean()
 average_hdi = filtered["hdi"].mean()
 average_internet = filtered["internet_usage_pct"].mean()
 median_gdp = filtered["gdp_per_capita"].median()
+dimension_regressions = compute_dimension_regressions(filtered)
+strongest_predictor = (
+    dimension_regressions.iloc[0]["dimension"] if not dimension_regressions.empty else "-"
+)
 
 st.title("Global AI Readiness Dashboard")
 st.caption(
@@ -436,19 +487,59 @@ st.caption(
     "akses internet, dan kondisi ekonomi."
 )
 
-kpi_cols = st.columns(5)
+kpi_cols = st.columns(6)
 kpi_cols[0].metric("Countries", f"{len(filtered)}")
 kpi_cols[1].metric("Leader", top_country["country"], f"{top_country['ai_overall_score']:.1f}")
 kpi_cols[2].metric("Average AI Score", f"{average_ai:.1f}")
 kpi_cols[3].metric("Average HDI", f"{average_hdi:.3f}")
 kpi_cols[4].metric("Median GDP/capita", format_number(median_gdp))
+kpi_cols[5].metric("Strongest Factor", strongest_predictor)
 
 tabs = st.tabs(["Overview", "Quadrant", "Compare", "Trends", "Simulator", "Data"])
 
 with tabs[0]:
-    insight_cols = st.columns(4)
-    for idx, insight in enumerate(build_insights(filtered, selected_metric_label, selected_metric)):
-        insight_cols[idx].info(insight)
+    dimension_col, regression_col = st.columns([1, 1.35])
+
+    dimension_col, regression_col = st.columns([0.9, 1.4])
+
+    with dimension_col:
+        render_dimension_pillar_cards()
+
+    with regression_col:
+        st.caption("Simple linear regression against Overall AI Score, sorted by R².")
+
+        if dimension_regressions.empty:
+            st.info("Not enough data to calculate regression strength.")
+        else:
+            reg_plot = dimension_regressions.sort_values("r_squared", ascending=True)
+            regression_fig = px.bar(
+                reg_plot,
+                x="r_squared",
+                y="dimension",
+                orientation="h",
+                text="r_squared",
+                color="r_squared",
+                color_continuous_scale="Viridis",
+                title=None,
+                hover_data={
+                    "dimension": False,
+                    "r_squared": ":.3f",
+                    "coefficient": ":.3f",
+                },
+                template=PLOTLY_TEMPLATE,
+            )
+            regression_fig.update_traces(texttemplate="%{text:.3f}", textposition="outside")
+            regression_fig.update_layout(
+                height=260,
+                yaxis_title="",
+                xaxis_title="R²",
+                xaxis=dict(range=[0, max(1, float(dimension_regressions["r_squared"].max()) + 0.08)]),
+                margin=dict(l=0, r=25, t=8, b=0),
+                coloraxis_showscale=False,
+            )
+            st.plotly_chart(regression_fig, width="stretch")
+
+    st.markdown("---")
 
     map_fig = px.choropleth(
         filtered,
@@ -481,20 +572,34 @@ with tabs[0]:
         st.plotly_chart(map_fig, width="stretch")
 
     with right:
-        ranking = filtered.nlargest(top_n, selected_metric).sort_values(selected_metric)
+        base_ranking = filtered.nlargest(top_n, selected_metric).copy()
+        selected_for_pin = filtered[filtered["country"].isin(selected_countries)].copy()
+        ranking = pd.concat([base_ranking, selected_for_pin], ignore_index=True)
+        ranking = ranking.drop_duplicates(subset="country").sort_values(selected_metric)
+
+        ranking["ranking_label"] = ranking.apply(
+            lambda row: f"#{int(row['rank_ai_overall'])} {row['country']}"
+            if pd.notna(row.get("rank_ai_overall"))
+            else row["country"],
+            axis=1,
+        )
+
         bar_fig = px.bar(
             ranking,
             x=selected_metric,
-            y="country",
+            y="ranking_label",
             orientation="h",
             color=selected_metric,
             color_continuous_scale="Viridis",
-            title=f"Top {top_n} Countries by {selected_metric_label}",
+            title=f"Top {top_n} Countries + Comparison Countries by {selected_metric_label}",
+            hover_name="country",
             hover_data={
                 selected_metric: ":.2f",
                 "ai_overall_score": ":.2f",
+                "rank_ai_overall": ":.0f",
                 "hdi": ":.3f",
                 "internet_usage_pct": ":.2f",
+                "ranking_label": False,
             },
             template=PLOTLY_TEMPLATE,
         )
@@ -507,7 +612,15 @@ with tabs[0]:
         )
         st.plotly_chart(bar_fig, width="stretch")
 
-    heatmap_source = filtered.nlargest(top_n, "ai_overall_score").set_index("country")
+    heatmap_source = filtered.nlargest(top_n, "ai_overall_score").copy()
+    selected_heat = filtered[filtered["country"].isin(selected_countries)].copy()
+    heatmap_source = pd.concat([heatmap_source, selected_heat], ignore_index=True)
+    heatmap_source = (
+        heatmap_source.drop_duplicates(subset="country")
+        .sort_values("ai_overall_score", ascending=False)
+        .set_index("country")
+    )
+
     heatmap_fig = px.imshow(
         heatmap_source[list(AI_DIMENSIONS.values())],
         labels=dict(x="AI Dimension", y="Country", color="Score"),
@@ -515,10 +628,28 @@ with tabs[0]:
         y=heatmap_source.index,
         color_continuous_scale="Magma",
         aspect="auto",
-        title=f"AI Dimension Heatmap for Top {top_n} Countries",
+        title=f"AI Dimension Heatmap for Top {top_n} Countries + Comparison Countries",
         template=PLOTLY_TEMPLATE,
     )
-    heatmap_fig.update_layout(height=460, margin=dict(l=0, r=0, t=55, b=0))
+
+    selected_heatmap_countries = [
+        country for country in selected_countries if country in list(heatmap_source.index)
+    ]
+    for country in selected_heatmap_countries:
+        y_idx = list(heatmap_source.index).index(country)
+        heatmap_fig.add_shape(
+            type="rect",
+            xref="x",
+            yref="y",
+            x0=-0.5,
+            x1=len(AI_DIMENSIONS) - 0.5,
+            y0=y_idx - 0.5,
+            y1=y_idx + 0.5,
+            line=dict(color="#ef4444", width=3),
+            fillcolor="rgba(0,0,0,0)",
+        )
+
+    heatmap_fig.update_layout(height=500, margin=dict(l=0, r=0, t=55, b=0))
     st.plotly_chart(heatmap_fig, width="stretch")
 
 # with tabs[1]:
