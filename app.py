@@ -643,8 +643,7 @@ def compute_dimension_regressions(data: pd.DataFrame) -> pd.DataFrame:
 
 def render_dimension_pillar_cards() -> None:
     st.caption(
-        "The Global AI Index uses 122 indicators from 24 public and private data sources "
-        "and 83 governments, grouped into 3 pillars and 7 sub-pillars."
+        "The Overall AI Score uses 122 indicators grouped into 3 pillars and 7 sub-pillars."
     )
 
     pillars = [
@@ -654,9 +653,34 @@ def render_dimension_pillar_cards() -> None:
     ]
 
     for pillar, subpillars in pillars:
-        with st.container(border=True):
-            st.markdown(f"**{pillar}**")
-            st.caption(f"{subpillars}")
+        st.markdown(
+            f"""
+            <div style="
+                border:1px solid #e4e7ec;
+                border-radius:8px;
+                padding:8px 10px;
+                margin-bottom:6px;
+                background:#ffffff;
+                line-height:1.2;
+            ">
+                <div style="
+                    font-size:0.80rem;
+                    font-weight:600;
+                    color:#101828;
+                    margin-bottom:2px;
+                ">
+                    {pillar}
+                </div>
+                <div style="
+                    font-size:0.78rem;
+                    color:#475467;
+                ">
+                    {subpillars}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 
 @st.cache_data
@@ -788,16 +812,12 @@ kpi_cols[5].metric("Strongest Factor", strongest_predictor)
 tabs = st.tabs(["Overview", "Quadrant", "Compare", "Trends", "Simulator", "Data"])
 
 with tabs[0]:
-    dimension_col, regression_col = st.columns([1, 1.35])
-
     dimension_col, regression_col = st.columns([0.9, 1.4])
 
     with dimension_col:
         render_dimension_pillar_cards()
 
     with regression_col:
-        st.caption("Simple linear regression against Overall AI Score, sorted by R².")
-
         if dimension_regressions.empty:
             st.info("Not enough data to calculate regression strength.")
         else:
@@ -829,7 +849,7 @@ with tabs[0]:
             )
             st.plotly_chart(regression_fig, width="stretch")
 
-    st.markdown("---")
+    # st.markdown("---")
 
     map_fig = px.choropleth(
         filtered,
